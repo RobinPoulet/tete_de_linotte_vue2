@@ -10,6 +10,16 @@
   </div>
 </template>
 
+<script>
+export default {
+    name: "App",
+    created() {
+      console.log(this.$store)
+      this.$store.dispatch('getProducts') // dispatch loading
+  }
+}
+</script>
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
