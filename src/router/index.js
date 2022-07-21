@@ -1,8 +1,10 @@
 import AboutViewVue from '@/views/AboutView.vue'
+import AdminViewVue from '@/views/AdminView.vue'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ProductsViewVue from '../views/ProductsView.vue'
+import ProductViewVue from '../views/ProductView.vue'
 
 Vue.use(VueRouter)
 
@@ -21,9 +23,20 @@ const routes = [
     component: AboutViewVue
   },
   {
+    path: '/admin',
+    name: 'admin',
+    component: AdminViewVue
+  },
+  {
     path: '/products',
     name: 'products',
     component: ProductsViewVue
+  },
+  {
+    path: '/products/:id',
+    name: 'product',
+    component: ProductViewVue,
+    props: true
   }
 ]
 
