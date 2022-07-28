@@ -1,19 +1,68 @@
 <template>
     <div class="admin">
-        <v-data-table
-            :headers="headers"
-            :items="products"
-            class="elevation-1"
+    
+        <v-btn
+            depressed
+            color="primary"
         >
-            <template v-slot:[`item.name`]="{ item }">
-                <v-chip
-                    :color="getColor(item.price)"
-                    dark
-                >
-                    {{ item.price }}
-                </v-chip>
+            <router-link
+                :to="{
+                    name: 'productEdit',
+                    params: {
+                        product: null
+                    }
+                }"
+            >
+                Ajouter un produit
+            </router-link>
+        </v-btn>
+        
+        <v-simple-table
+            fixed-header
+            height="300px"
+        >
+            <template v-slot:default>
+                <thead>
+                    <tr>
+                        <th class="text-left">
+                            Name
+                        </th>
+                        <th class="text-left">
+                            Description
+                        </th>
+                         <th class="text-left">
+                            Price
+                        </th>
+                         <th class="text-left">
+                            In Stock
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="product in products"
+                        :key="product._id"
+                    >
+                        <td> 
+                            <router-link 
+                                :to="{
+                                  name: 'product', 
+                                  params: {
+                                    id: product._id,
+                                    product: product
+                                  }
+                                }"
+                            > 
+                                {{ product.name }} 
+                            </router-link>
+                        </td>
+                        <td> {{ product.description }} </td>
+                        <td> {{ product.price }} € </td>
+                        <td> {{ product.inStock ? 'Disponible' : 'Out of Stock' }} </td>
+                    </tr>
+                </tbody>
             </template>
-        </v-data-table>
+        </v-simple-table>
     </div>
 </template>
 
@@ -58,3 +107,12 @@ export default {
     },
 }
 </script>
+
+<style>
+
+.admin {
+    margin: 10px;
+    padding: 20px;
+}
+
+</style>

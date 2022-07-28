@@ -13,7 +13,7 @@
           >
           <v-list-item two-line v-for="(product, index) in products" :key="index">
             <ProductList
-                :product="product"
+              :product="product"
             />
           </v-list-item>
           </v-card>
