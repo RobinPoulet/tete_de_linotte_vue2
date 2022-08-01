@@ -32,6 +32,7 @@
       <v-btn
         class="mr-4"
         type="submit"
+        :disabled="!isEnableSubmit"
       >
         submit
       </v-btn>
@@ -49,16 +50,24 @@ import axios from 'axios';
 
 export default {
     name: 'ProductEditView',
+
     props: {
         product: Object,
         editAction: String,
     },
+
     data: () => ({
         name: '',
         description: '',
         price: '',
-        checkbox: null,
+        checkbox: 0,
     }),
+
+    computed: {
+        isEnableSubmit() {
+            return this.name !== '' && this.description !== '' && this.price !== ''
+        },
+    },
 
     methods: {
         submit () {
@@ -68,26 +77,28 @@ export default {
                   name: this.name,
                   description: this.description,
                   price: this.price,
-                  inStock: this.checkbox ? 1 : 0,
+                  inStock: this.checkbox,
                 })
                 .then(() => {
+                  this.$toastr.s("SUCCESS", `${this.name} created`)
                   this.$store.dispatch('getProducts')
                   this.$router.push('/admin')
-                })
-                .catch(e => alert(e))
+                }) 
+                .catch(e => this.$toastr.e(`Error : ${e.message}`))
             } else {
               axios
                 .put("http://localhost:9000/api/product/" + this.product._id, {
                   name: this.name,
                   description: this.description,
                   price: this.price,
-                  inStock: this.checkbox ? 1 : 0,
+                  inStock: this.checkbox,
                 })
                 .then(() => {
+                  this.$toastr.s("SUCCESS", `${this.name} updated`);
                   this.$store.dispatch('getProducts')
                   this.$router.push('/admin')
                 })
-                .catch(e => alert(e))
+                .catch(e => this.$toastr.e(`Error : ${e.message}`))
             }
             
         },
@@ -95,17 +106,17 @@ export default {
             this.name = ''
             this.description = ''
             this.price = ''
-            this.checkbox = null
+            this.checkbox = 0
         },
     },
 
     mounted () {
-        if (this.product) {
-            this.name = this.product.name
-            this.description = this.product.description
-            this.price = this.product.price
-            this.checkbox = this.product.inStock
-        }
+      if (this.product) {
+          this.name = this.product.name
+          this.description = this.product.description
+          this.price = this.product.price
+          this.checkbox = this.product.inStock
+      }
     },
 }
 
