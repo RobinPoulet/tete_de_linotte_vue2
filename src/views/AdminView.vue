@@ -9,7 +9,8 @@
                 :to="{
                     name: 'productEdit',
                     params: {
-                        product: null
+                        product: null,
+                        editAction: create
                     }
                 }"
             >
@@ -36,6 +37,9 @@
                          <th class="text-left">
                             In Stock
                         </th>
+                        <th class="text-left">
+                            Edit
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,6 +63,19 @@
                         <td> {{ product.description }} </td>
                         <td> {{ product.price }} € </td>
                         <td> {{ product.inStock ? 'Disponible' : 'Out of Stock' }} </td>
+                        <td>
+                            <router-link
+                                :to="{
+                                    name: 'productEdit',
+                                    params: {
+                                        product: product,
+                                        editAction: edit
+                                    }
+                                }"
+                            >
+                                Edit
+                            </router-link>
+                        </td>
                     </tr>
                 </tbody>
             </template>
@@ -92,6 +109,8 @@ export default {
                     value: 'description' 
                 },
             ],
+            create : "create",
+            edit : "edit"
         }
     },
     computed: {

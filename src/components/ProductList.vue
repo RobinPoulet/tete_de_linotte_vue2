@@ -8,7 +8,10 @@
                 <v-btn>
                     <router-link :to="{
                         name: 'product',
-                        params: { id: product._id, product: product}
+                        params: { 
+                            id: product._id, 
+                            product: product
+                            }
                         }"
                     >
                         Go to {{ product.name}} page 

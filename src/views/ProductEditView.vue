@@ -1,7 +1,7 @@
 <template>
     <div class="product-edit">
     
-        <h3> {{ product ? "Edit product" : "Create product"}} </h3>
+        <h3> {{ editAction}} product</h3>
         
         <form @submit.prevent="submit" class="form-valid">
     
@@ -25,7 +25,6 @@
       
       <v-checkbox
         v-model="checkbox"
-        value="1"
         label="En stock ?"
         type="checkbox"
       ></v-checkbox>
@@ -51,7 +50,8 @@ import axios from 'axios';
 export default {
     name: 'ProductEditView',
     props: {
-        product: Object
+        product: Object,
+        editAction: String,
     },
     data: () => ({
         name: '',
@@ -62,18 +62,34 @@ export default {
 
     methods: {
         submit () {
-            axios
-              .post("http://localhost:9000/api/product", {
-                name: this.name,
-                description: this.description,
-                price: this.price,
-                inStock: this.checkbox ? 1 : 0,
-              })
-              .then(() => {
-                this.$store.dispatch('getProducts')
-                this.$router.push('/admin')
-              })
-              .catch(e => alert(e))
+            if (this.editAction === 'create') {
+              axios
+                .post("http://localhost:9000/api/product", {
+                  name: this.name,
+                  description: this.description,
+                  price: this.price,
+                  inStock: this.checkbox ? 1 : 0,
+                })
+                .then(() => {
+                  this.$store.dispatch('getProducts')
+                  this.$router.push('/admin')
+                })
+                .catch(e => alert(e))
+            } else {
+              axios
+                .put("http://localhost:9000/api/product/" + this.product._id, {
+                  name: this.name,
+                  description: this.description,
+                  price: this.price,
+                  inStock: this.checkbox ? 1 : 0,
+                })
+                .then(() => {
+                  this.$store.dispatch('getProducts')
+                  this.$router.push('/admin')
+                })
+                .catch(e => alert(e))
+            }
+            
         },
         clear () {
             this.name = ''
