@@ -19,7 +19,7 @@
         
         <v-simple-table
             fixed-header
-            height="300px"
+            height="700px"
         >
             <template v-slot:default>
                 <thead>

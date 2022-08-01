@@ -14,7 +14,6 @@
 export default {
     name: "App",
     created() {
-      console.log(this.$store)
       this.$store.dispatch('getProducts') // dispatch loading
   }
 }

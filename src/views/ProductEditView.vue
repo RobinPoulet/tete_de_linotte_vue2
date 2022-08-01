@@ -3,58 +3,36 @@
     
         <h3> {{ product ? "Edit product" : "Create product"}} </h3>
         
-        <validation-observer
-            ref="observer"
-            v-slot="{ invalid }"
-        >
         <form @submit.prevent="submit" class="form-valid">
-        <validation-provider
-            v-slot="{ errors }"
-            name="Name"
-            rules="required|max:10"
-        >
+    
         <v-text-field
           v-model="name"
-          :counter="20"
-          :error-messages="errors"
+          :counter="30"
           label="Name"
-          required
         ></v-text-field>
-        </validation-provider>
-        <validation-provider
-            v-slot="{ errors }"
-            name="price"
-            :rules="{
-                required: true,
-            }"
-        >
+
         <v-text-field
-            v-model="phoneNumber"
-            :error-messages="errors"
-            label="Price"
-            required
+          v-model="description"
+          :counter="90"
+          label="Description"
         ></v-text-field>
-      </validation-provider>
+       
+        <v-text-field
+          v-model="price"
+          label="Price"
+        ></v-text-field>
+    
       
-      <validation-provider
-        v-slot="{ errors }"
-        rules="required"
-        name="checkbox"
-      >
-        <v-checkbox
-          v-model="checkbox"
-          :error-messages="errors"
-          value="1"
-          label="En stock ?"
-          type="checkbox"
-          required
-        ></v-checkbox>
-      </validation-provider>
+      <v-checkbox
+        v-model="checkbox"
+        value="1"
+        label="En stock ?"
+        type="checkbox"
+      ></v-checkbox>
 
       <v-btn
         class="mr-4"
         type="submit"
-        :disabled="invalid"
       >
         submit
       </v-btn>
@@ -62,54 +40,57 @@
         clear
       </v-btn>
     </form>
-  </validation-observer>
     
     </div>
     
 </template>
 
 <script>
-import { required, max } from 'vee-validate/dist/rules'
-import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
-
-  setInteractionMode('eager')
-
-  extend('required', {
-    ...required,
-    message: '{_field_} can not be empty',
-  })
-
-  extend('max', {
-    ...max,
-    message: '{_field_} may not be greater than {length} characters',
-  })
+import axios from 'axios';
 
 export default {
     name: 'ProductEditView',
-    components: {
-        ValidationProvider,
-        ValidationObserver,
-    },
     props: {
         product: Object
     },
     data: () => ({
         name: '',
+        description: '',
         price: '',
         checkbox: null,
     }),
 
     methods: {
         submit () {
-            this.$refs.observer.validate()
+            axios
+              .post("http://localhost:9000/api/product", {
+                name: this.name,
+                description: this.description,
+                price: this.price,
+                inStock: this.checkbox ? 1 : 0,
+              })
+              .then(() => {
+                this.$store.dispatch('getProducts')
+                this.$router.push('/admin')
+              })
+              .catch(e => alert(e))
         },
         clear () {
             this.name = ''
+            this.description = ''
             this.price = ''
             this.checkbox = null
-            this.$refs.observer.reset()
         },
-    }
+    },
+
+    mounted () {
+        if (this.product) {
+            this.name = this.product.name
+            this.description = this.product.description
+            this.price = this.product.price
+            this.checkbox = this.product.inStock
+        }
+    },
 }
 
 </script>
