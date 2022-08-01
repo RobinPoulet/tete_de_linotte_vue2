@@ -1,23 +1,23 @@
 <template>
     <div class="admin">
-    
-        <v-btn
-            depressed
-            color="primary"
-        >
-            <router-link
-                :to="{
-                    name: 'productEdit',
-                    params: {
-                        product: null,
-                        editAction: create
-                    }
-                }"
-            >
-                Ajouter un produit
-            </router-link>
-        </v-btn>
-        
+
+        <div style="text-align: right; margin-bottom: 10px;">
+            <v-btn>
+                <router-link
+                    :to="{
+                        name: 'productEdit',
+                        params: {
+                            product: null,
+                            editAction: create
+                        }
+                    }"
+                >
+                    <v-icon>mdi-archive-plus</v-icon>   
+                </router-link>
+                Ajouter  un produit
+            </v-btn>
+        </div>
+         
         <v-simple-table
             fixed-header
             height="700px"
@@ -25,6 +25,8 @@
             <template v-slot:default>
                 <thead>
                     <tr>
+                        <th class="text-left">
+                        </th>
                         <th class="text-left">
                             Name
                         </th>
@@ -38,7 +40,8 @@
                             In Stock
                         </th>
                         <th class="text-left">
-                            Edit
+                        </th>
+                        <th class="text-left">
                         </th>
                     </tr>
                 </thead>
@@ -47,7 +50,7 @@
                         v-for="product in products"
                         :key="product._id"
                     >
-                        <td> 
+                        <td>
                             <router-link 
                                 :to="{
                                   name: 'product', 
@@ -57,9 +60,14 @@
                                   }
                                 }"
                             > 
-                                {{ product.name }} 
+                                <v-icon
+                                    color="red"
+                                >
+                                    mdi-account-eye
+                                </v-icon>  
                             </router-link>
                         </td>
+                        <td> {{ product.name }} </td>
                         <td> {{ product.description }} </td>
                         <td> {{ product.price }} € </td>
                         <td> {{ product.inStock ? 'Disponible' : 'Out of Stock' }} </td>
@@ -73,8 +81,24 @@
                                     }
                                 }"
                             >
-                                Edit
+                                <v-icon
+                                    color="blue darken-2"
+                                >
+                                    mdi-pencil
+                                </v-icon>
                             </router-link>
+                        </td>
+                        <td>
+                            <a 
+                                href="#"
+                                @click="deleteProduct(product)"
+                            >
+                                <v-icon
+                                    color="red"
+                                >
+                                    mdi-delete
+                                </v-icon>
+                            </a>
                         </td>
                     </tr>
                 </tbody>
@@ -85,45 +109,57 @@
 
 <script>
 import { mapState } from 'vuex'
+import axios from 'axios';
 
 export default {
+
     name: "AdminView",
+
     data() {
         return {
             dialog: false,
             dialogDelete: false,
             headers: [
                 {
-                    text: 'Name',
-                    align: 'start',
+                    text: "Name",
+                    align: "start",
                     sortable: true,
-                    value: 'name',
+                    value: "name",
                 },
-                { 
-                    text: 'Price', 
+                {
+                    text: "Price",
                     sortable: true,
-                    value: 'price' 
+                    value: "price"
                 },
-                { 
-                    text: 'Description', 
-                    value: 'description' 
+                {
+                    text: "Description",
+                    value: "description"
                 },
             ],
-            create : "create",
-            edit : "edit"
+            create: "create",
+            edit: "edit"
+        };
+    },
+
+    computed: {
+        ...mapState([
+            "products",
+            "loading"
+        ]),
+    },
+
+    methods: {
+        deleteProduct(product) {
+            axios
+                .delete(`http://localhost:9000/api/product/${product._id}`)
+                .then(() => {
+                    this.$toastr.s(`${product.name}`, "DELETED_SUCCESSFULLY");
+                    this.$store.dispatch("getProducts");
+            })
+                .catch(e => this.$toastr.e(`Error : ${e.message}`));
         }
     },
-    computed: {
-      ...mapState([
-        'products',
-        'loading'
-      ]),
-    },
-    methods: {
-     getColor (price) {
-        return price > 400 ? 'red' : price > 200 ? 'orange' : 'green'
-      },
-    },
+
 }
 </script>
 

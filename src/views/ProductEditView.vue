@@ -87,7 +87,7 @@ export default {
                 .catch(e => this.$toastr.e(`Error : ${e.message}`))
             } else {
               axios
-                .put("http://localhost:9000/api/product/" + this.product._id, {
+                .put(`http://localhost:9000/api/product/${this.product._id}`, {
                   name: this.name,
                   description: this.description,
                   price: this.price,
