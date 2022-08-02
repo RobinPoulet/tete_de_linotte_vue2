@@ -5,43 +5,71 @@
         
         <form @submit.prevent="submit" class="form-valid">
     
-        <v-text-field
-          v-model="name"
-          :counter="30"
-          label="Name"
-        ></v-text-field>
+          <v-text-field
+            v-model="name"
+            :counter="30"
+            label="Name"
+          ></v-text-field>
 
-        <v-text-field
-          v-model="description"
-          :counter="90"
-          label="Description"
-        ></v-text-field>
+          <v-text-field
+            v-model="description"
+            :counter="90"
+            label="Description"
+          ></v-text-field>
        
-        <v-text-field
-          v-model="price"
-          label="Price"
-        ></v-text-field>
+          <v-text-field
+            v-model="price"
+            label="Price"
+          ></v-text-field>
     
-      
-      <v-checkbox
-        v-model="checkbox"
-        label="En stock ?"
-        type="checkbox"
-      ></v-checkbox>
+          <v-checkbox
+            v-model="checkbox"
+            label="En stock ?"
+            type="checkbox"
+          ></v-checkbox>
 
-      <v-btn
-        class="mr-4"
-        type="submit"
-        :disabled="!isEnableSubmit"
-      >
-        submit
-      </v-btn>
-      <v-btn @click="clear">
-        clear
-      </v-btn>
+          <v-file-input
+            v-model="files"
+            color="deep-purple accent-4"
+            counter
+            label="File input"
+            multiple
+            placeholder="Select your files"
+            prepend-icon="mdi-paperclip"
+            outlined
+            :show-size="1000"
+          >
+            <template v-slot:selection="{ index, text }">
+              <v-chip
+                v-if="index < 2"
+                color="deep-purple accent-4"
+                dark
+                label
+                small
+              >
+                {{ text }}
+              </v-chip>
+
+              <span
+                v-else-if="index === 2"
+                class="text-overline grey--text text--darken-3 mx-2"
+              >
+                +{{ files.length - 2 }} File(s)
+              </span>
+            </template>
+          </v-file-input>
+
+          <v-btn
+            class="mr-4"
+            type="submit"
+            :disabled="!isEnableSubmit"
+          >envoyer</v-btn>
+
+          <v-btn @click="clear">remettre à 0</v-btn>
+
     </form>
     
-    </div>
+  </div>
     
 </template>
 
@@ -61,6 +89,7 @@ export default {
         description: '',
         price: '',
         checkbox: 0,
+        files: [],
     }),
 
     computed: {
@@ -72,13 +101,17 @@ export default {
     methods: {
         submit () {
             if (this.editAction === 'create') {
+              const product = {
+                name: this.name,
+                description: this.description,
+                price: this.price,
+                inStock: this.checkbox,
+              };
+              const productData = new FormData();
+              productData.append('product', JSON.stringify(product));
+              productData.append('image', this.files[0], product.name);
               axios
-                .post("http://localhost:9000/api/product", {
-                  name: this.name,
-                  description: this.description,
-                  price: this.price,
-                  inStock: this.checkbox,
-                })
+                .post("http://localhost:9000/api/product", productData)
                 .then(() => {
                   this.$toastr.s("SUCCESS", `${this.name} created`)
                   this.$store.dispatch('getProducts')

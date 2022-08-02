@@ -34,8 +34,11 @@
                         <th class="text-left">
                             Description
                         </th>
-                         <th class="text-left">
+                        <th class="text-left">
                             Prix
+                        </th>
+                        <th class="text-left">
+                            Image
                         </th>
                         <th class="text-left"></th>
                         <th class="text-left"></th>
@@ -92,6 +95,17 @@
                         <td> {{ product.name }} </td>
                         <td> {{ product.description }} </td>
                         <td> {{ product.price }} € </td>
+                        <td>
+                            <div v-if="product.imageUrl">
+                                <img
+                                    :src="product.imageUrl"
+                                    style="width: 100px; height: 100px;"
+                                />
+                            </div>
+                            <div v-else>
+                                <p>Pas d'image disponible</p>
+                            </div>
+                        </td>
                         <td>
                             <router-link
                                 :to="{
