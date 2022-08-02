@@ -25,24 +25,20 @@
             <template v-slot:default>
                 <thead>
                     <tr>
+                        <th class="text-left"></th>
                         <th class="text-left">
                         </th>
                         <th class="text-left">
-                            Name
+                            Nom
                         </th>
                         <th class="text-left">
                             Description
                         </th>
                          <th class="text-left">
-                            Price
+                            Prix
                         </th>
-                         <th class="text-left">
-                            In Stock
-                        </th>
-                        <th class="text-left">
-                        </th>
-                        <th class="text-left">
-                        </th>
+                        <th class="text-left"></th>
+                        <th class="text-left"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,6 +46,32 @@
                         v-for="product in products"
                         :key="product._id"
                     >
+                        <td> 
+                            <div
+                                v-if="product.inStock" 
+                                class="text-center"
+                            >
+                                <div class="my-2">
+                                    <v-btn
+                                        rounded
+                                        x-small
+                                        style="background-color: green;color: white;font-weight: 400;"
+                                    >Disponible</v-btn>
+                                </div>
+                            </div>
+                            <div
+                                v-else 
+                                class="text-center"
+                            >
+                                <div class="my-2">
+                                    <v-btn
+                                        rounded
+                                        x-small
+                                        style="background-color: red;color: white;font-weight: 400;"
+                                    >Pas de stock</v-btn>
+                                </div>
+                            </div>
+                        </td>
                         <td>
                             <router-link 
                                 :to="{
@@ -70,7 +92,6 @@
                         <td> {{ product.name }} </td>
                         <td> {{ product.description }} </td>
                         <td> {{ product.price }} € </td>
-                        <td> {{ product.inStock ? 'Disponible' : 'Out of Stock' }} </td>
                         <td>
                             <router-link
                                 :to="{
@@ -110,6 +131,7 @@
 <script>
 import { mapState } from 'vuex'
 import axios from 'axios';
+import swal from 'sweetalert';
 
 export default {
 
@@ -121,13 +143,13 @@ export default {
             dialogDelete: false,
             headers: [
                 {
-                    text: "Name",
+                    text: "Nom",
                     align: "start",
                     sortable: true,
                     value: "name",
                 },
                 {
-                    text: "Price",
+                    text: "Prix",
                     sortable: true,
                     value: "price"
                 },
@@ -150,14 +172,35 @@ export default {
 
     methods: {
         deleteProduct(product) {
-            axios
-                .delete(`http://localhost:9000/api/product/${product._id}`)
-                .then(() => {
-                    this.$toastr.s(`${product.name}`, "DELETED_SUCCESSFULLY");
-                    this.$store.dispatch("getProducts");
-            })
-                .catch(e => this.$toastr.e(`Error : ${e.message}`));
+            swal(
+                {
+                    title: "Supprimer cet article ?",
+                    text: "Attention la suppression est définitive !",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Delete it!",
+                    closeOnConfirm: true
+                },
+            )
+            .then(
+                () => {
+                    axios
+                        .delete(`http://localhost:9000/api/product/${product._id}`)
+                        .then(
+                            () => {
+                                this.$toastr.s(`${product.name}`, "Article supprimé");
+                                this.$store.dispatch("getProducts");
+                            }
+                        )
+                        .catch(
+                            e => this.$toastr.e(`Error : ${e.message}`)
+                        );
+                }
+        
+            )
         }
+           
     },
 
 }

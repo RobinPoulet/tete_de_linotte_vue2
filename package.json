@@ -10,9 +10,11 @@
   "dependencies": {
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "sweetalert": "^2.1.2",
     "vee-validate": "^3.4.14",
     "vue": "^2.6.14",
     "vue-router": "^3.5.4",
+    "vue-swal": "^1.0.0",
     "vue-toastr": "^2.1.2",
     "vuetify": "^2.6.0",
     "vuex": "^3.6.2"

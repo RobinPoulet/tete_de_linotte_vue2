@@ -4,6 +4,7 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import store from './store'
 import VueToastr from "vue-toastr";
+import VueSwal from 'vue-swal'
 
 Vue.use(VueToastr, {
   defaultProgressBar: false,
@@ -12,6 +13,8 @@ Vue.use(VueToastr, {
   defaultPosition: "toast-top-left",
   defaultClassNames: ["animated", "zoomInUp"]
 });
+
+Vue.use(VueSwal);
 
 Vue.config.productionTip = false
 
