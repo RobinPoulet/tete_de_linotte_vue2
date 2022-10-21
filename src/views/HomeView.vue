@@ -1,6 +1,6 @@
 <!-- eslint-disable no-mixed-spaces-and-tabs -->
 <template>
-  <div class="home">
+  <div class="home" style="margin-top: 8%;">
 		<div class="container">
 			<div class="container--left">
 				<div class="unsplash-credit">

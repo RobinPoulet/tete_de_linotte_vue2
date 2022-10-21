@@ -1,5 +1,5 @@
 <template>
-    <div class="admin">
+    <div class="admin" style="margin-top: 8%;">
 
         <div style="text-align: right; margin-bottom: 10px;">
             <v-btn>
@@ -11,6 +11,7 @@
                             editAction: create
                         }
                     }"
+                    style="text-decoration: none; color: inherit;"
                 >
                     <v-icon>mdi-archive-plus</v-icon>   
                 </router-link>
@@ -83,6 +84,7 @@
                                     product: product
                                   }
                                 }"
+                                style="text-decoration: none; color: inherit;"
                             > 
                                 <v-icon
                                     color="red"
@@ -114,6 +116,7 @@
                                         editAction: edit
                                     }
                                 }"
+                                style="text-decoration: none; color: inherit;"
                             >
                                 <v-icon
                                     color="blue darken-2"
@@ -126,6 +129,7 @@
                             <a 
                                 href="#"
                                 @click="deleteProduct(product)"
+                                style="text-decoration: none; color: inherit;"
                             >
                                 <v-icon
                                     color="red"

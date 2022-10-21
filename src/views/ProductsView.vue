@@ -8,14 +8,37 @@
         <v-container fluid>
           <v-card
             class="mx-auto"
-            max-width="1600"
-            tile
+            max-width="450"
           >
-          <v-list-item two-line v-for="(product, index) in products" :key="index">
-            <ProductList
-              :product="product"
-            />
-          </v-list-item>
+          <v-list three-line>
+            <v-list-item v-for="product in products" :key="product.title">
+              <v-list-item-avatar v-show="product.imageUrl">
+                <v-img :src="product.imageUrl"></v-img>
+              </v-list-item-avatar>
+
+              <v-list-item-content>
+                <v-list-item-title>{{ product.name }}</v-list-item-title>
+                <v-list-item-subtitle>{{ product.description }}</v-list-item-subtitle>
+              </v-list-item-content>
+
+              <v-list-item-action>
+                <v-btn icon>
+                  <router-link :to="{
+                        name: 'product',
+                        params: { 
+                            id: product._id, 
+                            product: product
+                            }
+                        }"
+                        style="text-decoration: none; color: inherit;"
+                    >
+                    <v-icon color="grey lighten-1">mdi-eye</v-icon> 
+                  </router-link>
+                  
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>    
+           </v-list> 
           </v-card>
         </v-container>
       </div>
@@ -24,11 +47,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import ProductList from "@/components/ProductList.vue";
 
 export default {
     name: "ProductsView",
-    components: { ProductList },
     data() {
       return {};
     },
@@ -42,4 +63,9 @@ export default {
 </script>
 
 <style>
+
+  .products{
+    margin-top: 10%;
+    margin-left: 4%;
+  }
 </style>
