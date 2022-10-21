@@ -1,5 +1,5 @@
 <template>
-    <div class="playlistmovie">
+    <div class="product-list">
         <v-list-item-content>
             <v-list-item-title>
                 <h3> {{ product.name }} </h3>
@@ -24,7 +24,7 @@
 
 <script>
 export default {
-  name: "PlaylistMovie",
+  name: "ProductList",
   props: {
     product: Object
   }

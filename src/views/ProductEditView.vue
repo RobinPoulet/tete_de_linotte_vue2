@@ -28,36 +28,22 @@
             type="checkbox"
           ></v-checkbox>
 
-          <v-file-input
-            v-model="files"
-            color="deep-purple accent-4"
-            counter
-            label="File input"
-            multiple
-            placeholder="Select your files"
-            prepend-icon="mdi-paperclip"
-            outlined
-            :show-size="1000"
-          >
-            <template v-slot:selection="{ index, text }">
-              <v-chip
-                v-if="index < 2"
-                color="deep-purple accent-4"
-                dark
-                label
-                small
-              >
-                {{ text }}
-              </v-chip>
-
-              <span
-                v-else-if="index === 2"
-                class="text-overline grey--text text--darken-3 mx-2"
-              >
-                +{{ files.length - 2 }} File(s)
-              </span>
-            </template>
-          </v-file-input>
+          <v-file-input 
+            v-model="image"
+            label="Image"
+            prepend-icon="mdi-image"
+            accept="image/*"
+          />
+          <v-img
+            v-if="editAction === 'Create'"
+            width="100px" 
+            :src="url" 
+          />
+          <v-img
+            v-else
+            width="100px" 
+            :src="product.imageUrl" 
+          />
 
           <v-btn
             class="mr-4"
@@ -80,8 +66,8 @@ export default {
     name: 'ProductEditView',
 
     props: {
-        product: Object,
-        editAction: String,
+      product: Object,
+      editAction: String,
     },
 
     data: () => ({
@@ -89,50 +75,52 @@ export default {
         description: '',
         price: '',
         checkbox: 0,
-        files: [],
+        image: null,
     }),
 
     computed: {
         isEnableSubmit() {
             return this.name !== '' && this.description !== '' && this.price !== ''
         },
+        url() {
+            if (!this.image) return;
+            return URL.createObjectURL(this.image);
+        }
     },
 
     methods: {
         submit () {
-            if (this.editAction === 'create') {
-              const product = {
+
+          const product = {
                 name: this.name,
                 description: this.description,
                 price: this.price,
                 inStock: this.checkbox,
               };
-              const productData = new FormData();
-              productData.append('product', JSON.stringify(product));
-              productData.append('image', this.files[0], product.name);
-              axios
-                .post("http://localhost:9000/api/product", productData)
-                .then(() => {
-                  this.$toastr.s("SUCCESS", `${this.name} created`)
-                  this.$store.dispatch('getProducts')
-                  this.$router.push('/admin')
-                }) 
-                .catch(e => this.$toastr.e(`Error : ${e.message}`))
-            } else {
-              axios
-                .put(`http://localhost:9000/api/product/${this.product._id}`, {
-                  name: this.name,
-                  description: this.description,
-                  price: this.price,
-                  inStock: this.checkbox,
-                })
-                .then(() => {
-                  this.$toastr.s("SUCCESS", `${this.name} updated`);
-                  this.$store.dispatch('getProducts')
-                  this.$router.push('/admin')
-                })
-                .catch(e => this.$toastr.e(`Error : ${e.message}`))
-            }
+
+          const productData = new FormData();
+          productData.append('product', JSON.stringify(product));
+          productData.append('image', this.image, product.name);
+
+          if (this.editAction === 'create') {
+            axios
+              .post("http://localhost:9000/api/product", productData)
+              .then(() => {
+                this.$toastr.s("SUCCESS", `${this.name} created`)
+                this.$store.dispatch('getProducts')
+                this.$router.push('/admin')
+              }) 
+              .catch(e => this.$toastr.e(`Error : ${e.message}`))
+          } else {
+            axios
+              .put(`http://localhost:9000/api/product/${this.product._id}`, productData)
+              .then(() => {
+                this.$toastr.s("SUCCESS", `${this.name} updated`);
+                this.$store.dispatch('getProducts')
+                this.$router.push('/admin')
+              })
+              .catch(e => this.$toastr.e(`Error : ${e.message}`))
+          }
             
         },
         clear () {
@@ -144,11 +132,20 @@ export default {
     },
 
     mounted () {
-      if (this.product) {
+      if (this.product !== null) {
           this.name = this.product.name
           this.description = this.product.description
           this.price = this.product.price
           this.checkbox = this.product.inStock
+          if (this.product.imageUrl) {
+            axios
+            .get(this.product.imageUrl)
+            .then(response => {
+              console.log(response)
+              this.image = response.data
+            })
+            .catch(e => this.$toastr.e(`Error : ${e.message}`))
+          }
       }
     },
 }
@@ -157,13 +154,13 @@ export default {
 
 <style>
 
-    .product-edit {
-        margin: auto;
-        padding: 20px;
-    }
-    
-    .form-valid {
-        width: 50%;
-    }
+  .product-edit {
+      margin: auto;
+      padding: 20px;
+  }
+  
+  .form-valid {
+      width: 50%;
+  }
 
 </style>

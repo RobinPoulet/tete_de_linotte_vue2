@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import ProductList from "@/components/ProductList.vue";
 
 export default {
@@ -33,27 +33,13 @@ export default {
       return {};
     },
     computed: {
-      ...mapState([
-        'products',
-        'loading'
-      ])
+      ...mapGetters({
+        products: 'getAllProducts',
+        loading: 'isLoading'
+      })
     },
 }
 </script>
 
-<style lang="scss">
-$primary-color: #4169E1;
-$secondary-color: darken($primary-color, 30%);
-h1 {
-  transition: 1s;
-  color: $secondary-color;
-  font-size: 100px;
-  font-family: Arial, Helvetica, sans-serif;
-  text-align: center;
-  color: deepskyblue;
-}
-h1:hover {
-  color: $primary-color;
-}
-
+<style>
 </style>

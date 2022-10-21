@@ -26,8 +26,7 @@
                 <thead>
                     <tr>
                         <th class="text-left"></th>
-                        <th class="text-left">
-                        </th>
+                        <th class="text-left"></th>
                         <th class="text-left">
                             Nom
                         </th>
@@ -96,10 +95,10 @@
                         <td> {{ product.description }} </td>
                         <td> {{ product.price }} € </td>
                         <td>
-                            <div v-if="product.imageUrl">
+                            <div v-if="product.imageUrl" style="padding:5px;">
                                 <img
                                     :src="product.imageUrl"
-                                    style="width: 100px; height: 100px;"
+                                    style="width: 80px; height: 80px;"
                                 />
                             </div>
                             <div v-else>
@@ -143,7 +142,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import axios from 'axios';
 import swal from 'sweetalert';
 
@@ -178,10 +177,10 @@ export default {
     },
 
     computed: {
-        ...mapState([
-            "products",
-            "loading"
-        ]),
+        ...mapGetters({
+            products: 'getAllProducts',
+            loading: 'isLoading'
+        }),
     },
 
     methods: {
@@ -222,9 +221,9 @@ export default {
 
 <style>
 
-.admin {
-    margin: 10px;
-    padding: 20px;
-}
+    .admin {
+        margin: 10px;
+        padding: 20px;
+    }
 
 </style>
