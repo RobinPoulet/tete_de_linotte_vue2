@@ -11,6 +11,15 @@
           label="Name"
         ></v-text-field>
 
+        <v-select
+          :items="categories"
+          item-text="name"
+          item-value="_id"
+          label="Select"
+          return-object
+          single-line
+        ></v-select>
+
         <v-text-field
           v-model="description"
           :counter="90"
@@ -61,6 +70,7 @@
 
 <script>
 import axios from 'axios';
+import { mapGetters } from 'vuex'
 export default {
   name: 'ProductEditView',
   props: {
@@ -71,6 +81,7 @@ export default {
       name: '',
       description: '',
       price: '',
+      categoryId: '',
       checkbox: 0,
       image: null,
   }),
@@ -81,7 +92,10 @@ export default {
       url() {
           if (!this.image) return;
           return URL.createObjectURL(this.image);
-      }
+      },
+      ...mapGetters({
+        categories: 'getAllCategories',
+      }),
   },
   methods: {
       submit () {
@@ -100,7 +114,7 @@ export default {
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} created`)
               this.$store.dispatch('getProducts')
-              this.$router.push('/admin/product/list')
+              this.$router.push('/admin/products/list')
             }) 
             .catch(e => this.$toastr.e(`Error : ${e.message}`))
         } else {
@@ -109,7 +123,7 @@ export default {
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} updated`);
               this.$store.dispatch('getProducts')
-              this.$router.push('/admin/product/list')
+              this.$router.push('/admin/products/list')
             })
             .catch(e => this.$toastr.e(`Error : ${e.message}`))
         }

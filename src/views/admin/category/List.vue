@@ -138,10 +138,9 @@ export default {
                     title: "Supprimer cette catégorie ?",
                     text: "Attention la suppression est définitive !",
                     icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, Delete it!",
-                    closeOnConfirm: true
+                    iconColor: "red",
+                    button: true,
+                    closeModal: true
                 },
             )
             .then(
