@@ -1,11 +1,12 @@
-import AboutViewVue from '@/views/AboutView.vue'
-import AdminViewVue from '@/views/AdminView.vue'
+import About from '@/views/About.vue'
+import Admin from '@/views/admin/Admin.vue'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import ProductsViewVue from '../views/ProductsView.vue'
-import ProductViewVue from '../views/ProductView.vue'
-import ProductEditViewVue from '../views/ProductEditView.vue'
+import Home from '../views/Home.vue'
+import Products from '../views/Products.vue'
+import Product from '../views/Product.vue'
+import ProductEdit from '../views/admin/product/Edit.vue'
+import CategoryEdit from '../views/admin/category/Edit.vue'
 
 Vue.use(VueRouter)
 
@@ -13,7 +14,7 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: Home
   },
   {
     path: '/about',
@@ -21,28 +22,34 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: AboutViewVue
+    component: About
   },
   {
     path: '/admin',
     name: 'admin',
-    component: AdminViewVue
+    component: Admin
   },
   {
     path: '/products',
     name: 'products',
-    component: ProductsViewVue
+    component: Products
   },
   {
     path: '/products/:id',
     name: 'product',
-    component: ProductViewVue,
+    component: Product,
     props: true
   },
   {
-    path: '/products/edit',
+    path: '/admin/products/edit',
     name: 'productEdit',
-    component: ProductEditViewVue,
+    component: ProductEdit,
+    props: true
+  },
+  {
+    path: '/admin/category/edit',
+    name: 'categoryEdit',
+    component: CategoryEdit,
     props: true
   }
 ]

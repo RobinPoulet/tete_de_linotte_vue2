@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <!-- eslint-disable no-mixed-spaces-and-tabs -->
 <template>
   <div class="home" style="margin-top: 8%;">
@@ -10,7 +11,12 @@
 			<div class="container--right">
 				<h1>Tête de linotte</h1>
 				<h2>Création artisanale "made in France"</h2>
-				<router-link to="/products"><div class="btn--white">Voir le catalogue</div></router-link>
+				<router-link 
+					to="/products"
+					style="text-decoration: none; color: inherit;"
+				>
+					<div class="btn--white">Voir le catalogue</div>
+				</router-link>
 			</div>
   	</div>
 		<div class="home--middle">

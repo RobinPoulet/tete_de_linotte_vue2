@@ -8,6 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     products: [],
+    categories: [],
     loading: true,
     isVisible: false,
     modalMode: 'Login',
@@ -17,6 +18,7 @@ export default new Vuex.Store({
   },
   getters: {
     getAllProducts: (state) => state.products,
+    getAllCategories: (state) => state.categories,
     isLoading: (state) => state.loading,
     isVisible: (state) => state.isVisible,
     getMode: (state) => state.modalMode,
@@ -30,6 +32,9 @@ export default new Vuex.Store({
     },
     SET_LOADING(state, loading) {
       state.loading = loading
+    },
+    SET_CATEGORIES(state, categories) {
+      state.categories = categories
     },
     show: (state) => {
       state.isVisible = true
@@ -73,8 +78,17 @@ export default new Vuex.Store({
       axios
       .get("http://localhost:9000/api/product")
       .then(response => {
-        commit('SET_PRODUCTS', response.data.products)
-        commit('SET_LOADING', false)
+        commit('SET_PRODUCTS', response.data.products);
+        commit('SET_LOADING', false);
+      })
+      .catch(e => console.log(e))
+    },
+    getCategories({commit}) {
+      axios
+      .get("http://localhost:9000/api/category")
+      .then(response => {
+        commit('SET_CATEGORIES', response.data.categories);
+        commit('SET_LOADING', false);
       })
       .catch(e => console.log(e))
     },

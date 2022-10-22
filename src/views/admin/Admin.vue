@@ -2,21 +2,34 @@
     <div class="admin" style="margin-top: 8%;">
 
         <div style="text-align: right; margin-bottom: 10px;">
-            <v-btn>
-                <router-link
-                    :to="{
-                        name: 'productEdit',
-                        params: {
-                            product: null,
-                            editAction: create
-                        }
-                    }"
-                    style="text-decoration: none; color: inherit;"
-                >
-                    <v-icon>mdi-archive-plus</v-icon>   
-                </router-link>
-                Ajouter  un produit
-            </v-btn>
+            <router-link
+                :to="{
+                    name: 'productEdit',
+                    params: {
+                        product: null,
+                        editAction: create
+                    }
+                }"
+                style="text-decoration: none; color: inherit;"
+            >
+                <v-btn>
+                    <v-icon>mdi-archive-plus</v-icon>Ajouter  un produit
+                </v-btn>
+            </router-link>
+            <router-link
+                :to="{
+                    name: 'categoryEdit',
+                    params: {
+                        category: null,
+                        editAction: create
+                    }
+                }"
+                style="text-decoration: none; color: inherit;"
+            >
+                <v-btn>
+                    <v-icon>mdi-archive-plus</v-icon>Ajouter  une catégorie
+                </v-btn>
+            </router-link>
         </div>
          
         <v-simple-table
@@ -149,11 +162,8 @@
 import { mapGetters } from 'vuex'
 import axios from 'axios';
 import swal from 'sweetalert';
-
 export default {
-
     name: "AdminView",
-
     data() {
         return {
             dialog: false,
@@ -179,14 +189,12 @@ export default {
             edit: "edit"
         };
     },
-
     computed: {
         ...mapGetters({
             products: 'getAllProducts',
             loading: 'isLoading'
         }),
     },
-
     methods: {
         deleteProduct(product) {
             swal(
@@ -219,15 +227,12 @@ export default {
         }
            
     },
-
 }
 </script>
 
 <style>
-
     .admin {
         margin: 10px;
         padding: 20px;
     }
-
 </style>

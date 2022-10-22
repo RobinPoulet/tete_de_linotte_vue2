@@ -22,6 +22,7 @@ export default {
     name: "App",
     created() {
         this.$store.dispatch("getProducts"); // dispatch loading
+		this.$store.dispatch("getCategories"); 
     },
     components: { Navbar, Footer, Popup, Login, Signup },
     computed: {
