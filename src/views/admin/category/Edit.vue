@@ -66,8 +66,8 @@ export default {
               .post("http://localhost:9000/api/category", category)
               .then(() => {
                 this.$toastr.s("SUCCESS", `${this.name} created`)
-              //  this.$store.dispatch('getProducts')
-                this.$router.push('/admin')
+                this.$store.dispatch('getCategories')
+                this.$router.push('/admin/category/list')
               }) 
               .catch(e => this.$toastr.e(`Error : ${e.message}`))
           } else {
@@ -76,7 +76,7 @@ export default {
               .then(() => {
                 this.$toastr.s("SUCCESS", `${this.name} updated`);
                 this.$store.dispatch("getCategories"); 
-                this.$router.push('/admin')
+                this.$router.push('/admin/category/list')
               })
               .catch(e => this.$toastr.e(`Error : ${e.message}`))
           }

@@ -1,238 +1,57 @@
 <template>
-    <div class="admin" style="margin-top: 8%;">
+    <div class="admin">
 
-        <div style="text-align: right; margin-bottom: 10px;">
-            <router-link
-                :to="{
-                    name: 'productEdit',
-                    params: {
-                        product: null,
-                        editAction: create
-                    }
-                }"
-                style="text-decoration: none; color: inherit;"
-            >
-                <v-btn>
-                    <v-icon>mdi-archive-plus</v-icon>Ajouter  un produit
-                </v-btn>
-            </router-link>
-            <router-link
-                :to="{
-                    name: 'categoryEdit',
-                    params: {
-                        category: null,
-                        editAction: create
-                    }
-                }"
-                style="text-decoration: none; color: inherit;"
-            >
-                <v-btn>
-                    <v-icon>mdi-archive-plus</v-icon>Ajouter  une catégorie
-                </v-btn>
-            </router-link>
-        </div>
-         
-        <v-simple-table
-            fixed-header
-            height="700px"
+        <v-card
+            class="mx-auto"
+            max-width="300"
+            tile
         >
-            <template v-slot:default>
-                <thead>
-                    <tr>
-                        <th class="text-left"></th>
-                        <th class="text-left"></th>
-                        <th class="text-left">
-                            Nom
-                        </th>
-                        <th class="text-left">
-                            Description
-                        </th>
-                        <th class="text-left">
-                            Prix
-                        </th>
-                        <th class="text-left">
-                            Image
-                        </th>
-                        <th class="text-left"></th>
-                        <th class="text-left"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="product in products"
-                        :key="product._id"
+            <v-list dense>
+                <v-subheader>ADMIN</v-subheader>
+                <v-list-item-group
+                    color="primary"
+                >
+                    <v-list-item
+                        v-for="(item, i) in items"
+                        :key="i"
                     >
-                        <td> 
-                            <div
-                                v-if="product.inStock" 
-                                class="text-center"
-                            >
-                                <div class="my-2">
-                                    <v-btn
-                                        rounded
-                                        x-small
-                                        style="background-color: green;color: white;font-weight: 400;"
-                                    >Disponible</v-btn>
-                                </div>
-                            </div>
-                            <div
-                                v-else 
-                                class="text-center"
-                            >
-                                <div class="my-2">
-                                    <v-btn
-                                        rounded
-                                        x-small
-                                        style="background-color: red;color: white;font-weight: 400;"
-                                    >Pas de stock</v-btn>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <router-link 
+                        <v-list-item-icon>
+                            <v-icon v-text="item.icon"></v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <router-link
                                 :to="{
-                                  name: 'product', 
-                                  params: {
-                                    id: product._id,
-                                    product: product
-                                  }
+                                    name: item.routerLinkName,
                                 }"
                                 style="text-decoration: none; color: inherit;"
                             > 
-                                <v-icon
-                                    color="red"
-                                >
-                                    mdi-account-eye
-                                </v-icon>  
+                                {{ item.text }}   
                             </router-link>
-                        </td>
-                        <td> {{ product.name }} </td>
-                        <td> {{ product.description }} </td>
-                        <td> {{ product.price }} € </td>
-                        <td>
-                            <div v-if="product.imageUrl" style="padding:5px;">
-                                <img
-                                    :src="product.imageUrl"
-                                    style="width: 80px; height: 80px;"
-                                />
-                            </div>
-                            <div v-else>
-                                <p>Pas d'image disponible</p>
-                            </div>
-                        </td>
-                        <td>
-                            <router-link
-                                :to="{
-                                    name: 'productEdit',
-                                    params: {
-                                        product: product,
-                                        editAction: edit
-                                    }
-                                }"
-                                style="text-decoration: none; color: inherit;"
-                            >
-                                <v-icon
-                                    color="blue darken-2"
-                                >
-                                    mdi-pencil
-                                </v-icon>
-                            </router-link>
-                        </td>
-                        <td>
-                            <a 
-                                href="#"
-                                @click="deleteProduct(product)"
-                                style="text-decoration: none; color: inherit;"
-                            >
-                                <v-icon
-                                    color="red"
-                                >
-                                    mdi-delete
-                                </v-icon>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </template>
-        </v-simple-table>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list-item-group>
+            </v-list>
+        </v-card>
+        
     </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import axios from 'axios';
-import swal from 'sweetalert';
 export default {
     name: "AdminView",
-    data() {
-        return {
-            dialog: false,
-            dialogDelete: false,
-            headers: [
-                {
-                    text: "Nom",
-                    align: "start",
-                    sortable: true,
-                    value: "name",
-                },
-                {
-                    text: "Prix",
-                    sortable: true,
-                    value: "price"
-                },
-                {
-                    text: "Description",
-                    value: "description"
-                },
-            ],
-            create: "create",
-            edit: "edit"
-        };
-    },
-    computed: {
-        ...mapGetters({
-            products: 'getAllProducts',
-            loading: 'isLoading'
-        }),
-    },
-    methods: {
-        deleteProduct(product) {
-            swal(
-                {
-                    title: "Supprimer cet article ?",
-                    text: "Attention la suppression est définitive !",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, Delete it!",
-                    closeOnConfirm: true
-                },
-            )
-            .then(
-                () => {
-                    axios
-                        .delete(`http://localhost:9000/api/product/${product._id}`)
-                        .then(
-                            () => {
-                                this.$toastr.s(`${product.name}`, "Article supprimé");
-                                this.$store.dispatch("getProducts");
-                            }
-                        )
-                        .catch(
-                            e => this.$toastr.e(`Error : ${e.message}`)
-                        );
-                }
-        
-            )
-        }
-           
-    },
+    data: () => ({
+        items: [
+            { text: 'Product', icon: 'mdi-clock', routerLinkName: 'productList'},
+            { text: 'Category', icon: 'mdi-account', routerLinkName: 'categoryList'},
+        ],
+    }),
 }
 </script>
 
 <style>
     .admin {
-        margin: 10px;
-        padding: 20px;
+        margin-top: 8%;
+        margin-bottom: 8%;
+        margin-left: 4%;
     }
 </style>

@@ -67,7 +67,6 @@ export default {
     product: Object
   },
   data: () => ({
-      show: false,
   }),
 }
 </script>
