@@ -10,14 +10,14 @@
 		<v-container fluid>
 
 			<router-view></router-view>
-
+			<router-view name="helper"/>
 		</v-container>
 	
 	</v-main>
 
 	<Footer />
 
-	<Popup v-show="popupVisible">
+	<Popup v-show="popupVisible" :popup-mode="popupMode">
     <component :is="popupMode" slot="body"></component>
     </Popup>
 </v-app>

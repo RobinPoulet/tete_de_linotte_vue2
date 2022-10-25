@@ -1,29 +1,66 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <div>
-      <h1>Connexion</h1>
-      <form @submit.prevent="login">
-        <input v-model="email" type="email" placeholder="Votre email">
-        <input v-model="password" type="password" placeholder="Mot de passe">
-  
-        <div v-if="authStatus === 'loading'" class="loader" />
-  
-        <div v-else class="btn--group">
-          <button type="submit" class="btn--green">
-            Connexion
-          </button>
-          <button class="btn--green--alt" @click="signup('Signup')">
-            Inscription
-          </button>
-        </div>
-      </form>
-  
+  <v-form
+    ref="form"
+    v-model="valid"
+    lazy-validation
+   
+   >
+  <v-container>
+   
+   <v-row>
+    <v-col
+      cols="12"
+      md="2"
+    ></v-col>
+    <v-col
+      cols="12"
+      md="8"
+    >
+    <v-text-field
+      v-model="email"
+      :rules="emailRules"
+      label="Email"
+      required
+    ></v-text-field> 
+
+    <v-text-field
+      v-model="password"
+      :rules="passwordRules"
+      label="Mot de passe"
+      type="password"
+      required
+    ></v-text-field> 
+
+    <div v-if="authStatus === 'loading'" class="loader" />
+
+      <v-btn
+        :disabled="!valid"
+        color="success"
+        class="mr-4"
+        @click="validate"
+      >
+        Validate
+      </v-btn> 
+
       <div v-if="errors && errors.length > 0" class="errors--list">
         <div v-for="error of errors" :key="error">
           {{ error }}
         </div>
       </div>
-    </div>
+    </v-col>
+    <v-col
+      cols="12"
+      md="2"
+    ></v-col>
+    </v-row>
+    </v-container>
+
+  </v-form>
+
+
+
+
 </template>
   
 <script>
@@ -31,8 +68,17 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
     data () {
       return {
+        valid: true,
         email: '',
+        emailRules: [
+          v => !!v || 'E-mail is required',
+          v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        ],
         password: '',
+        passwordRules: [
+          v => !!v || 'Password is required',
+          v => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,10}$/.test(v) || 'Password must be less than 10 characters, more than 6, include one letter in lower case, one letter in uppercase, one digit, and one special character',
+        ],
         error: []
       }
     },
@@ -48,8 +94,13 @@ export default {
         await this.$store.dispatch('login', { email, password })
       },
       ...mapActions({
-        signup: 'changeMode'
-      })
+        
+      }),
+      validate() {
+        if (this.$refs.form.validate()) {
+          this.login()
+        }
+      }
     }
 }
 </script>

@@ -1,8 +1,37 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <div>
-      <h1>Inscription</h1>
-      <form @submit.prevent="signup">
+   <v-form
+    ref="form"
+    v-model="valid"
+    lazy-validation
+   
+   >
+  <v-container>
+   
+   <v-row>
+    <v-col
+      cols="12"
+      md="2"
+    ></v-col>
+    <v-col
+      cols="12"
+      md="8"
+    >
+        <v-text-field
+          v-model="name"
+          :counter="15"
+          :rules="nameRules"
+          label="Nom"
+          required
+        ></v-text-field> 
+
+        <v-text-field
+          v-model="firstname"
+          :counter="15"
+          :rules="firstnameRules"
+          label="Prénom"
+          required
+        ></v-text-field>
         <input v-model="name" type="text" placeholder="Votre nom">
         <input v-model="firstname" type="text" placeholder="Votre prénom">
         <input v-model="email" type="email" placeholder="Votre email">
@@ -19,14 +48,24 @@
             Connexion
           </button>
         </div>
-      </form>
+    
   
       <div v-if="errors && errors.length > 0" class="errors--list">
         <div v-for="error of errors" :key="error">
           {{ error }}
         </div>
       </div>
-    </div>
+  
+  </v-col>
+    <v-col
+      cols="12"
+      md="2"
+    ></v-col>
+    </v-row>
+    </v-container>
+
+  </v-form>
+
 </template>
   
 <script>
@@ -34,11 +73,19 @@ import { mapActions, mapGetters } from 'vuex'
 export default {
     data () {
       return {
-        name: '',
-        firstname: '',
         email: '',
         password: '',
-        passwordConfirm: ''
+        passwordConfirm: '',
+        name: '',
+        nameRules: [
+          v => !!v || 'Name is required',
+          v => (v && v.length <= 15) || 'Name must be less than 15 characters',
+        ],
+        firstname: '',
+        firstnameRules: [
+          v => !!v || 'Firstname is required',
+          v => (v && v.length <= 15) || 'Firstname must be less than 15 characters',
+        ],
       }
     },
     computed: {

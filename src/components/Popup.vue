@@ -1,89 +1,68 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <transition name="modal">
-      <div class="modal-mask">
-        <div class="modal-wrapper">
-          <div class="modal-container" @click.stop>
-            <v-btn
-              @click="close"
-            >
-              x
-            </v-btn>
-            <div class="modal-subcontainer">
-              <slot name="body" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </transition>
+  <div class="text-center">
+    <v-dialog
+          v-model="dialog"
+          width="50%"
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn 
+          icon
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon>mdi-account-box</v-icon>
+        </v-btn>
+          <p class="mt-3">Se connecter</p>
+      </template> 
+
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          {{ popupMode }}
+        </v-card-title>
+        <slot name="body" />
+        
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <p>Pas encore inscris ? </p>
+          <v-btn
+            v-if="popupMode === 'Login'"
+            class="ma-2"
+            color="success"
+            @click="signup('Signup')"
+          >Je m'inscris</v-btn> 
+        </v-card-actions>
+      </v-card>
+        </v-dialog> 
+  </div>      
 </template>
   
 <script>
 import { mapActions } from 'vuex'
 export default {
-    methods: {
-      ...mapActions({
-        close: 'hide'
-      })
+// eslint-disable-next-line vue/multi-word-component-names
+  name: 'Popup',
+  props: {
+    popupMode: {
+      type: String,
+      required: true
     }
+  }, 
+  data () {
+    return {
+      dialog: false,
+      notifications: false,
+    }
+  },
+  methods: {
+    ...mapActions({
+      close: 'hide',
+      signup: 'changeMode'
+    })
+  }
 }
 </script>
   
-<style scoped>
-      .modal-mask {
-          position: fixed;
-          z-index: 2000;
-          top: 0px;
-          right: 0px;
-          bottom: 0px;
-          left: 0px;
-          overflow-y: auto;
-          -webkit-transform: translate3d(0,0,0);
-          transform: translate3d(0,0,0);
-          background-color: rgba(0, 0, 0, 0.5);
-          display: flex;
-          transition: opacity .3s ease;
-      }
-      .modal-wrapper {
-          display: flex;
-          margin: auto;
-          max-width: 760px;
-          padding: 64px;
-          width: 100%;
-      }
-      .modal-container {
-          display: flex;
-          margin: 0px auto;
-          background-color: #fff;
-          border-radius: 5px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
-          transition: all .3s ease;
-          color: #35495e;
-          position: relative;
-      }
-      .close-btn {
-          position: absolute;
-          right: 15px;
-          top: 10px;
-          cursor: pointer;
-          font-size: 20px;
-          color: #35495e;
-      }
-      .modal-subcontainer {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          width: 100%;
-          padding: 20px;
-      }
-      .modal-enter {
-          opacity: 0;
-      }
-      .modal-leave-active {
-          opacity: 0;
-      }
-      .modal-enter .modal-container,
-      .modal-leave-active .modal-container {
-          transform: scale(1.1);
-      }
-</style>

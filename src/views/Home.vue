@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <!-- eslint-disable no-mixed-spaces-and-tabs -->
 <template>
-  <div class="home" style="margin-top: 8%;">
+  <div class="home">
 		<div class="container">
 			<div class="container--left">
 				<div class="unsplash-credit">
@@ -39,7 +39,6 @@ export default {
 	margin: 0 auto;
 	height: 100vh;
 	display: flex;
-	padding-top: 60px;
 }
 .container .container--left {
 	width: 50%;
