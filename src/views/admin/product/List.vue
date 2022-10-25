@@ -125,17 +125,15 @@
                             </router-link>
                         </td>
                         <td>
-                            <a 
-                                href="#"
+                            <v-btn 
                                 @click="deleteProduct(product)"
-                                style="text-decoration: none; color: inherit;"
                             >
                                 <v-icon
                                     color="red"
                                 >
                                     mdi-delete
                                 </v-icon>
-                            </a>
+                            </v-btn>
                         </td>
                     </tr>
                 </tbody>
@@ -187,11 +185,23 @@ export default {
                 {
                     title: "Supprimer cet article ?",
                     text: "Attention la suppression est définitive !",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, Delete it!",
-                    closeOnConfirm: true
+                    icon: "warning",
+                    buttons: {
+                        cancel:{
+                            text:"Cancel",
+                            value:null,
+                            visible:false,
+                            className:"",
+                            closeModal:true,
+                        },
+                        confirm:{
+                            text:"OK",
+                            value:true,
+                            visible:true,
+                            className:"",
+                            closeModal:true
+                        }
+                    },
                 },
             )
             .then(
@@ -217,9 +227,4 @@ export default {
 </script>
 
 <style>
-    .admin-product-list {
-        margin-top: 8%;
-        margin-bottom: 8%;
-        margin-left: 4%;
-    }
 </style>

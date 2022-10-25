@@ -1,99 +1,52 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-    <div class="footer--container">
-      <div class="footer--top">
-        <div class="container--top">
-          <div class="top--col">
-            <router-link to="/">Home</router-link>
-          </div>
-          <div class="top--col">
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-          </div>
-          <div class="top--col">
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-          </div>
-          <div class="top--col">
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-            <a href="#">Exemple</a>
-          </div>
-        </div>
-      </div>
-      <div class="footer--bottom">
-        <div class="container--bottom">
-          <div>© Exemple, 2020</div>
-          <div class="bottom--rs">
-            <a href="#"><i class="fab fa-facebook-f" /></a>
-            <a href="#"><i class="fab fa-instagram" /></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
+<v-footer
+    dark
+    padless
+  >
+    <v-card
+      flat
+      tile
+      class="indigo lighten-1 white--text text-center"
+      style="background-image: url('https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg');"
+    >
+      <v-card-text>
+        <v-btn
+          v-for="icon in icons"
+          :key="icon"
+          class="mx-4 white--text"
+          icon
+        >
+          <v-icon size="24px">
+            {{ icon }}
+          </v-icon>
+        </v-btn>
+      </v-card-text>
+
+      <v-card-text class="white--text pt-0">
+        Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet. Mauris cursus commodo interdum. Praesent ut risus eget metus luctus accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor vel ut orci. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      </v-card-text>
+
+      <v-divider></v-divider>
+
+      <v-card-text class="white--text">
+        {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
+      </v-card-text>
+    </v-card>
+  </v-footer>
+</template>
   
-  <script>
-  export default {
+<script>
+export default {
+  data: () => ({
+    icons: [
+      'mdi-facebook',
+      'mdi-twitter',
+      'mdi-linkedin',
+      'mdi-instagram',
+    ],
+  }),
+}
+</script>
   
-  }
-  </script>
   
-  <style scoped>
-  .footer--top, .footer--bottom {
-      color: white;
-  }
-  .footer--top .brand {
-      font-size: 2rem;
-  }
-  .footer--top {
-      background-color: rgba(26, 188, 156,1.0);
-  }
-  .footer--top a {
-      color: white;
-      text-decoration: none;
-      padding-bottom: 10px;
-  }
-  .footer--top a:last-of-type {
-      padding-bottom: 0;
-  }
-  .footer--top a:hover {
-      text-decoration: underline;
-  }
-  .footer--bottom {
-      background-color: rgba(22, 160, 133,1.0);
-  }
-  .container--top, .container--bottom {
-      max-width: 1200px;
-      margin: auto;
-  }
-  .container--top {
-      display: flex;
-      justify-content: space-between;
-      padding: 40px 0;
-  }
-  .container--top .top--col {
-      display: flex;
-      flex-direction: column;
-  }
-  .container--bottom {
-      display: flex;
-      justify-content: space-between;
-      padding: 20px 0;
-  }
-  .bottom--rs a {
-      display: inline-block;
-      text-decoration: none;
-      color: white;
-      padding: 0 10px;
-      transition: all .2s;
-  }
-  .bottom--rs a:hover {
-      transform: translateY(-2px);
-  }
-  </style>

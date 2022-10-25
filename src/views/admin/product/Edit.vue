@@ -3,7 +3,7 @@
   
       <h3> {{ editAction}} product</h3>
       
-      <form @submit.prevent="submit" class="form-valid">
+      <form @submit.prevent="submit">
   
         <v-text-field
           v-model="name"
@@ -12,12 +12,12 @@
         ></v-text-field>
 
         <v-select
+          v-model="categoryId"
           :items="categories"
           item-text="name"
+          item-color="primary"
           item-value="_id"
-          label="Select"
-          return-object
-          single-line
+          label="Catégorie de l'article"
         ></v-select>
 
         <v-text-field
@@ -37,22 +37,37 @@
           type="checkbox"
         ></v-checkbox>
 
-        <v-file-input 
-          v-model="image"
-          label="Image"
-          prepend-icon="mdi-image"
-          accept="image/*"
-        />
+        <div  v-if="isEditImage">
         <v-img
-          v-if="editAction === 'create'"
-          width="100px" 
-          :src="url" 
-        />
-        <v-img
+          :src="product.imageUrl"
+          max-width="200"
+          max-height="200"
+        >
+        </v-img>
+        <v-btn
+            color="primary"
+            rounded
+            dark
+            :loading="isSelecting"
+            @click="handleFileImport"
+          > Edit
+            <input
+              ref="uploader"
+              class="d-none"
+              type="file"
+              @change="onFileChanged"
+            >
+          </v-btn>
+        </div>
+        <v-file-input
           v-else
-          width="100px" 
-          :src="product.imageUrl" 
-        />
+          v-model="image"
+          :rules="rules"
+          accept="image/png, image/jpeg, image/bmp"
+          placeholder="Pick an avatar"
+          prepend-icon="mdi-camera"
+          label="Avatar"
+        ></v-file-input>
 
         <v-btn
           class="mr-4"
@@ -84,14 +99,15 @@ export default {
       categoryId: '',
       checkbox: 0,
       image: null,
+      rules: [
+        value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
+      ],
+      isSelecting: false,
+      isEditImage: false,
   }),
   computed: {
       isEnableSubmit() {
-          return this.name !== '' && this.description !== '' && this.price !== ''
-      },
-      url() {
-          if (!this.image) return;
-          return URL.createObjectURL(this.image);
+          return this.name !== '' && this.description !== '' && this.price !== '' && this.categoryId !== ''
       },
       ...mapGetters({
         categories: 'getAllCategories',
@@ -101,6 +117,7 @@ export default {
       submit () {
         const product = {
               name: this.name,
+              categoryId: this.categoryId,
               description: this.description,
               price: this.price,
               inStock: this.checkbox,
@@ -109,8 +126,7 @@ export default {
         productData.append('product', JSON.stringify(product));
         productData.append('image', this.image, product.name);
         if (this.editAction === 'create') {
-          axios
-            .post("http://localhost:9000/api/product", productData)
+          axios.post("http://localhost:9000/api/product", productData)
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} created`)
               this.$store.dispatch('getProducts')
@@ -118,8 +134,7 @@ export default {
             }) 
             .catch(e => this.$toastr.e(`Error : ${e.message}`))
         } else {
-          axios
-            .put(`http://localhost:9000/api/product/${this.product._id}`, productData)
+          axios.put(`http://localhost:9000/api/product/${this.product._id}`, productData)
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} updated`);
               this.$store.dispatch('getProducts')
@@ -131,26 +146,32 @@ export default {
       },
       clear () {
           this.name = ''
+          this.categoryId = ''
           this.description = ''
           this.price = ''
           this.checkbox = 0
+      },
+      handleFileImport() {
+        this.isSelecting = true;
+
+        window.addEventListener('focus', () => {
+          this.isSelecting = false;
+        }, {once: true});
+        this.$refs.uploader.click();
+      },
+      onFileChanged(e) {
+        this.image = e.target.files[0];
+        this.isEditImage = false;
       },
   },
   mounted () {
     if (this.product !== null) {
         this.name = this.product.name
+        this.categoryId = this.product.categoryId
         this.description = this.product.description
         this.price = this.product.price
         this.checkbox = this.product.inStock
-        if (this.product.imageUrl) {
-          axios
-          .get(this.product.imageUrl)
-          .then(response => {
-            console.log(response)
-            this.image = response.data
-          })
-          .catch(e => this.$toastr.e(`Error : ${e.message}`))
-        }
+        this.isEditImage = this.product.imageUrl !== null
     }
   },
 }

@@ -49,9 +49,4 @@ export default {
 </script>
 
 <style>
-    .admin {
-        margin-top: 8%;
-        margin-bottom: 8%;
-        margin-left: 4%;
-    }
 </style>

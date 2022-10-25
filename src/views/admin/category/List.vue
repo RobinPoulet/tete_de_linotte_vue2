@@ -166,9 +166,4 @@ export default {
 </script>
 
 <style>
-    .admin-category-list {
-        margin-top: 8%;
-        margin-bottom: 8%;
-        margin-left: 4%;
-    }
 </style>
