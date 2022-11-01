@@ -14,7 +14,8 @@ export default new Vuex.Store({
     modalMode: 'Login',
     status: '',
     authenticated: false,
-    errors: []
+    errors: [],
+    addElement: {isAddElement : "none", elementAdd: {}}
   },
   getters: {
     getAllProducts: (state) => state.products,
@@ -24,7 +25,8 @@ export default new Vuex.Store({
     getMode: (state) => state.modalMode,
     isAuthenticated: (state) => state.authenticated,
     authStatus: (state) => state.status,
-    getErrors: (state) => state.errors
+    getErrors: (state) => state.errors,
+    isAddElement: (state) => state.addElement,
   },
   mutations: {
     SET_PRODUCTS(state, products) {
@@ -71,6 +73,12 @@ export default new Vuex.Store({
     reset: (state) => {
         state.status = '';
         state.errors =  [];
+    },
+    addElementSuccess: (state, element) => {
+      state.addElement = {isAddElement: "success", elementAdd: element};
+    },
+    resetAddElement: (state) => {
+      state.addElement = {isAddElement: "none", elementAdd: {}};
     }
   },
   actions: {
@@ -170,6 +178,20 @@ export default new Vuex.Store({
     },
     setAuthenticated: async function({ commit }) {
         commit('authSuccess');
+    },
+    addCategory({ commit }, category) {
+      axios.post("https://api-tdl-backend.herokuapp.com/api/category", category)
+      .then(() => {
+        commit('addElementSuccess', { type: 'category', name: category.name})
+        this.dispatch("getCategories")
+      })
+      .catch(e => {
+        console.log('requete post echoué', category)
+        console.log(e)
+      })
+    },
+    resetAddElement({ commit }) {
+      commit('resetAddElement')
     }
   },
   modules: {

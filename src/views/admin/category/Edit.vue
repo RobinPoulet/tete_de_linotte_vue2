@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import axios from 'axios';
 
 export default {
@@ -50,7 +51,10 @@ export default {
     computed: {
         isEnableSubmit() {
             return this.name !== '' && this.description !== ''
-        }
+        },
+        ...mapGetters({
+            isAddElement: 'isAddElement',
+        }),
     },
 
     methods: {
@@ -62,14 +66,7 @@ export default {
               };
 
           if (this.editAction === 'create') {
-            axios
-              .post("https://api-tdl-backend.herokuapp.com/api/category", category)
-              .then(() => {
-                this.$toastr.s("SUCCESS", `${this.name} created`)
-                this.$store.dispatch('getCategories')
-                this.$router.push('/admin/category/list')
-              }) 
-              .catch(e => this.$toastr.e(`Error : ${e.message}`))
+            this.$store.dispatch('addCategory', category)
           } else {
             axios
               .put(`https://api-tdl-backend.herokuapp.com/api/category/${this.category._id}`, category)
@@ -86,6 +83,16 @@ export default {
             this.name = ''
             this.description = ''
         },
+    },
+
+    watch: {
+        isAddElement(value) {
+            if (value.isAddElement === "success") {
+                this.$toastr.s("SUCCESS", `${value.elementAdd.type} : ${value.elementAdd.name} created`)
+                this.$store.dispatch("resetAddElement")
+                this.$router.push('/admin/category/list')
+            }
+        }
     },
 
     mounted () {

@@ -146,7 +146,7 @@ export default {
             .then(
                 () => {
                     axios
-                        .delete(`http://localhost:9000/api/category/${category._id}`)
+                        .delete(`https://api-tdl-backend.herokuapp.com/api/category/${category._id}`)
                         .then(
                             () => {
                                 this.$toastr.s(`${category.name}`, "Catégorie supprimée");
