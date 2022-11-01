@@ -76,7 +76,7 @@ export default new Vuex.Store({
   actions: {
     getProducts({commit}) {
       axios
-      .get("http://localhost:9000/api/product")
+      .get("https://api-tdl-backend.herokuapp.com/api/product")
       .then(response => {
         commit('SET_PRODUCTS', response.data.products);
         commit('SET_LOADING', false);
@@ -85,7 +85,7 @@ export default new Vuex.Store({
     },
     getCategories({commit}) {
       axios
-      .get("http://localhost:9000/api/category")
+      .get("https://api-tdl-backend.herokuapp.com/api/category")
       .then(response => {
         commit('SET_CATEGORIES', response.data.categories);
         commit('SET_LOADING', false);
@@ -133,7 +133,7 @@ export default new Vuex.Store({
           return;
       }
       await axios
-      .post("http://localhost:9000/api/auth/signup", user)
+      .post("https://api-tdl-backend.herokuapp.com/api/auth/signup", user)
       .then(() => {
           commit('authSuccess');
           commit('hide', null, { root: true });
@@ -156,7 +156,7 @@ export default new Vuex.Store({
           return;
       }
       await axios
-      .post("http://localhost:9000/api/auth/login", user)
+      .post("https://api-tdl-backend.herokuapp.com/api/auth/login", user)
       .then(() => {
           commit('authSuccess');
           commit('hide', null, { root: true });

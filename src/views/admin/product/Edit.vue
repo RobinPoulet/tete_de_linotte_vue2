@@ -126,7 +126,7 @@ export default {
         productData.append('product', JSON.stringify(product));
         productData.append('image', this.image, product.name);
         if (this.editAction === 'create') {
-          axios.post("http://localhost:9000/api/product", productData)
+          axios.post("https://api-tdl-backend.herokuapp.com/api/product", productData)
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} created`)
               this.$store.dispatch('getProducts')
@@ -134,7 +134,7 @@ export default {
             }) 
             .catch(e => this.$toastr.e(`Error : ${e.message}`))
         } else {
-          axios.put(`http://localhost:9000/api/product/${this.product._id}`, productData)
+          axios.put(`https://api-tdl-backend.herokuapp.com/api/product/${this.product._id}`, productData)
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} updated`);
               this.$store.dispatch('getProducts')

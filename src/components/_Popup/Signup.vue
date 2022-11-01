@@ -32,22 +32,40 @@
           label="Prénom"
           required
         ></v-text-field>
-        <input v-model="name" type="text" placeholder="Votre nom">
-        <input v-model="firstname" type="text" placeholder="Votre prénom">
-        <input v-model="email" type="email" placeholder="Votre email">
-        <input v-model="password" type="password" placeholder="Mot de passe">
-        <input v-model="passwordConfirm" type="password" placeholder="Confirmation">
-  
-        <div v-if="authStatus === 'loading'" class="loader" />
-  
-        <div v-else class="btn--group">
-          <button type="submit" class="btn--green">
-            Inscription
-          </button>
-          <button class="btn--green--alt" @click="login('Login')">
-            Connexion
-          </button>
-        </div>
+
+        <v-text-field
+          v-model="email"
+          :rules="emailRules"
+          label="Email"
+          required
+        ></v-text-field> 
+
+        <v-text-field
+          v-model="password"
+          :rules="passwordRules"
+          label="Mot de passe"
+          type="password"
+          required
+        ></v-text-field> 
+
+        <v-text-field
+          v-model="passwordConfirm"
+          :rules="passwordConfirmRules"
+          label="Confirmation du mot de passe"
+          type="password"
+          required
+        ></v-text-field> 
+
+        <!-- <div v-if="authStatus === 'loading'" class="loader" />  -->
+
+        <v-btn
+        :disabled="!valid"
+        color="success"
+        class="mr-4"
+        @click="validate"
+        >
+          Validate
+        </v-btn>
     
   
       <div v-if="errors && errors.length > 0" class="errors--list">
@@ -56,7 +74,7 @@
         </div>
       </div>
   
-  </v-col>
+    </v-col>
     <v-col
       cols="12"
       md="2"
@@ -74,8 +92,20 @@ export default {
     data () {
       return {
         email: '',
+        emailRules: [
+          v => !!v || 'E-mail is required',
+          v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        ],
         password: '',
+        passwordRules: [
+          v => !!v || 'Password is required',
+          v => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,10}$/.test(v) || 'Password must be less than 10 characters, more than 6, include one letter in lower case, one letter in uppercase, one digit, and one special character',
+        ],
         passwordConfirm: '',
+        passwordConfirmRules: [
+          v => !!v || 'Password Confirmation is required',
+          v => v === this.password || 'Password Confirmation must be the same as Password',
+        ],
         name: '',
         nameRules: [
           v => !!v || 'Name is required',

@@ -63,7 +63,7 @@ export default {
 
           if (this.editAction === 'create') {
             axios
-              .post("http://localhost:9000/api/category", category)
+              .post("https://api-tdl-backend.herokuapp.com/api/category", category)
               .then(() => {
                 this.$toastr.s("SUCCESS", `${this.name} created`)
                 this.$store.dispatch('getCategories')
@@ -72,7 +72,7 @@ export default {
               .catch(e => this.$toastr.e(`Error : ${e.message}`))
           } else {
             axios
-              .put(`http://localhost:9000/api/category/${this.category._id}`, category)
+              .put(`https://api-tdl-backend.herokuapp.com/api/category/${this.category._id}`, category)
               .then(() => {
                 this.$toastr.s("SUCCESS", `${this.name} updated`);
                 this.$store.dispatch("getCategories"); 

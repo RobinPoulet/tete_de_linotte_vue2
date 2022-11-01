@@ -27,13 +27,22 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
+          <div v-if="popupMode === 'Login'">
           <p>Pas encore inscris ? </p>
           <v-btn
-            v-if="popupMode === 'Login'"
             class="ma-2"
             color="success"
             @click="signup('Signup')"
           >Je m'inscris</v-btn> 
+        </div>
+        <div v-else>
+          <p>Déjà inscrit ? </p>
+          <v-btn
+            class="ma-2"
+            color="success"
+            @click="login('Login')"
+          >Je me connecte</v-btn> 
+        </div>
         </v-card-actions>
       </v-card>
         </v-dialog> 
@@ -60,7 +69,8 @@ export default {
   methods: {
     ...mapActions({
       close: 'hide',
-      signup: 'changeMode'
+      signup: 'changeMode',
+      login: 'changeMode'
     })
   }
 }
