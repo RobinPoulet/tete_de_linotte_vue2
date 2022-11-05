@@ -207,7 +207,7 @@ export default {
             .then(
                 () => {
                     axios
-                        .delete(`http://localhost:9000/api/product/${product._id}`)
+                        .delete(`https://api-tdl-backend.herokuapp.com/${product._id}`)
                         .then(
                             () => {
                                 this.$toastr.s(`${product.name}`, "Article supprimé");

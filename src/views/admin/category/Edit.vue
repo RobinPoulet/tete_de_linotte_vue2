@@ -54,45 +54,41 @@ export default {
         },
         ...mapGetters({
             isAddElement: 'isAddElement',
+            isUpdateElement: 'isUpdateElement',
         }),
     },
 
     methods: {
-        submit () {
-
-          const category = {
-                name: this.name,
-                description: this.description
-              };
-
-          if (this.editAction === 'create') {
-            this.$store.dispatch('addCategory', category)
-          } else {
-            axios
-              .put(`https://api-tdl-backend.herokuapp.com/api/category/${this.category._id}`, category)
-              .then(() => {
-                this.$toastr.s("SUCCESS", `${this.name} updated`);
-                this.$store.dispatch("getCategories"); 
-                this.$router.push('/admin/category/list')
-              })
-              .catch(e => this.$toastr.e(`Error : ${e.message}`))
-          }
-            
-        },
-        clear () {
-            this.name = ''
-            this.description = ''
-        },
+      submit () {
+        const category = {
+          name: this.name,
+          description: this.description
+        };
+        this.editAction === 'create' ? 
+        this.$store.dispatch('addCategory', category) :
+        this.$store.dispatch('updateCategory', this.category._id, category)
+      },
+      clear () {
+        this.name = ''
+        this.description = ''
+      },
     },
 
     watch: {
-        isAddElement(value) {
-            if (value.isAddElement === "success") {
-                this.$toastr.s("SUCCESS", `${value.elementAdd.type} : ${value.elementAdd.name} created`)
-                this.$store.dispatch("resetAddElement")
-                this.$router.push('/admin/category/list')
-            }
+      isAddElement(value) {
+        if (value.isAddElement === "success") {
+            this.$toastr.s("SUCCESS", `${value.elementAdd.type} : ${value.elementAdd.name} created`)
+            this.$store.dispatch("resetAddElement")
+            this.$router.push('/admin/category/list')
         }
+      },
+      isUpdateElement(value) {
+        if (value.isUpdateElement === "success") {
+            this.$toastr.s("SUCCESS", `${value.elementUpdate.type} : ${value.elementUpdate.name} updated`)
+            this.$store.dispatch("resetUpdateElement")
+            this.$router.push('/admin/category/list')
+        }
+      },
     },
 
     mounted () {

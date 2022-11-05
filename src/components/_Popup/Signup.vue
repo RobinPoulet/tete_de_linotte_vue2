@@ -62,9 +62,9 @@
         :disabled="!valid"
         color="success"
         class="mr-4"
-        @click="validate"
+        @click="signup"
         >
-          Validate
+          Je m'insris
         </v-btn>
     
   

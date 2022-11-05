@@ -10,12 +10,17 @@
           icon
           v-bind="attrs"
           v-on="on"
+          @click="showPopup"
         >
           <v-icon>mdi-account-box</v-icon>
         </v-btn>
           <p class="mt-3">Se connecter</p>
       </template> 
 
+      <v-btn @click="closeDialog">
+        Close
+      </v-btn>
+      
       <v-card>
         <v-card-title class="text-h5 grey lighten-2">
           {{ popupMode }}
@@ -50,7 +55,7 @@
 </template>
   
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 export default {
 // eslint-disable-next-line vue/multi-word-component-names
   name: 'Popup',
@@ -66,12 +71,27 @@ export default {
       notifications: false,
     }
   },
+  computed: {
+    ...mapGetters({
+      isVisible: 'isVisible',
+    })
+  },
   methods: {
     ...mapActions({
       close: 'hide',
       signup: 'changeMode',
-      login: 'changeMode'
-    })
+      login: 'changeMode',
+      showPopup: 'show',
+    }),
+    closeDialog() {
+      this.dialog = false;
+    }
+  },
+  watch: {
+    isVisible: function (val) {
+      console.log(val)
+      this.dialog = val;
+    }
   }
 }
 </script>

@@ -111,6 +111,7 @@ export default {
       },
       ...mapGetters({
         categories: 'getAllCategories',
+        isAddElement: 'isAddElement'
       }),
   },
   methods: {
@@ -126,6 +127,7 @@ export default {
         productData.append('product', JSON.stringify(product));
         productData.append('image', this.image, product.name);
         if (this.editAction === 'create') {
+          this.$store.dispatch('addProduct', productData)
           axios.post("https://api-tdl-backend.herokuapp.com/api/product", productData)
             .then(() => {
               this.$toastr.s("SUCCESS", `${this.name} created`)
@@ -164,14 +166,24 @@ export default {
         this.isEditImage = false;
       },
   },
+
+  watch: {
+    isAddElement(value) {
+      if (value.isAddElement === "success") {
+          this.$toastr.s("SUCCESS", `${value.elementAdd.type} : ${value.elementAdd.name} created`)
+          this.$store.dispatch("resetAddElement")
+          this.$router.push('/admin/product/list')
+      }
+    }
+  },
+
   mounted () {
     if (this.product !== null) {
-        this.name = this.product.name
-        this.categoryId = this.product.categoryId
-        this.description = this.product.description
-        this.price = this.product.price
-        this.checkbox = this.product.inStock
-        this.isEditImage = this.product.imageUrl !== null
+      ['name', 'categoryId', 'description', 'price', 'price'].forEach(
+        key => (this[key] = this.product[key])
+      );
+      this.checkbox = this.product.inStock
+      this.isEditImage = this.product.imageUrl !== null
     }
   },
 }

@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
 import Cookies from 'vue-universal-cookies'
+import Category from '../../api/category'
+import Product from '../../api/product'
+import User from '../../api/user'
 
 Vue.use(Vuex)
 
@@ -15,7 +17,8 @@ export default new Vuex.Store({
     status: '',
     authenticated: false,
     errors: [],
-    addElement: {isAddElement : "none", elementAdd: {}}
+    addElement: {isAddElement : "none", elementAdd: {}},
+    updateElement: {isUpdateElement : "none", elementUpdate: {}}
   },
   getters: {
     getAllProducts: (state) => state.products,
@@ -27,6 +30,7 @@ export default new Vuex.Store({
     authStatus: (state) => state.status,
     getErrors: (state) => state.errors,
     isAddElement: (state) => state.addElement,
+    isUpdateElement: (state) => state.updateElement
   },
   mutations: {
     SET_PRODUCTS(state, products) {
@@ -77,34 +81,32 @@ export default new Vuex.Store({
     addElementSuccess: (state, element) => {
       state.addElement = {isAddElement: "success", elementAdd: element};
     },
+    updateElementSuccess: (state, element) => {
+      state.updateElement = {isUpdateElement: "success", elementUpdate: element};
+    },
     resetAddElement: (state) => {
       state.addElement = {isAddElement: "none", elementAdd: {}};
+    },
+    resetUpdateElement: (state) => {
+      state.updateElement = {isUpdateElement: "none", elementUpdate: {}};
     }
   },
   actions: {
     getProducts({commit}) {
-      axios
-      .get("https://api-tdl-backend.herokuapp.com/api/product")
-      .then(response => {
-        commit('SET_PRODUCTS', response.data.products);
-        commit('SET_LOADING', false);
-      })
-      .catch(e => console.log(e))
+      Product.getAllProducts()
+        .then(response => {
+          commit('SET_PRODUCTS', response.data.products);
+          commit('SET_LOADING', false);
+        })
+        .catch(e => console.log(e))
     },
     getCategories({commit}) {
-      axios
-      .get("https://api-tdl-backend.herokuapp.com/api/category")
-      .then(response => {
-        commit('SET_CATEGORIES', response.data.categories);
-        commit('SET_LOADING', false);
-      })
-      .catch(e => console.log(e))
-    },
-    nuxtServerInit({ dispatch }, { req }) {
-      const cookies = new Cookies(req.headers.cookie);
-      if (cookies.get('token_mysite')) {
-          dispatch('setAuthenticated');
-      }
+      Category.getAllCategories()
+        .then(response => {
+          commit('SET_CATEGORIES', response.data.categories);
+          commit('SET_LOADING', false);
+        })
+        .catch(e => console.log(e))
     },
     show: ({ commit }) => {
       return new Promise((resolve) => {
@@ -124,7 +126,7 @@ export default new Vuex.Store({
             resolve()
         })
     },
-    signup: async function ({ commit }, user) {
+    signup: ({ commit }, user) => {
       let errs = [];
       commit('authRequest');
       if (user.email.length === 0) {
@@ -140,17 +142,16 @@ export default new Vuex.Store({
           commit('authError', errs);
           return;
       }
-      await axios
-      .post("https://api-tdl-backend.herokuapp.com/api/auth/signup", user)
-      .then(() => {
-          commit('authSuccess');
-          commit('hide', null, { root: true });
-      })
-      .catch(err => {
-          commit('authError', [err.response.data]);
-      });
+      User.signup(user)
+        .then(() => {
+            commit('authSuccess');
+            commit('hide', null, { root: true });
+        })
+        .catch(err => {
+            commit('authError', [err.response.data]);
+        });
   },
-  login: async function({ commit }, user) {
+  login: ({ commit }, user) => {
       let errs = [];
       commit('authRequest');
       if (user.email.length === 0) {
@@ -163,15 +164,14 @@ export default new Vuex.Store({
           commit('authError', errs);
           return;
       }
-      await axios
-      .post("https://api-tdl-backend.herokuapp.com/api/auth/login", user)
-      .then(() => {
-          commit('authSuccess');
-          commit('hide', null, { root: true });
-      })
-      .catch(err => {
-          commit('authError', [err.response.data]);
-      });
+      User.login(user)
+        .then(() => {
+            commit('authSuccess');
+            commit('hide', null, { root: true });
+        })
+        .catch(err => {
+            commit('authError', [err.response.data]);
+        });
     },
     logout: async function({ commit }) {
         commit('logout');
@@ -180,18 +180,43 @@ export default new Vuex.Store({
         commit('authSuccess');
     },
     addCategory({ commit }, category) {
-      axios.post("https://api-tdl-backend.herokuapp.com/api/category", category)
-      .then(() => {
-        commit('addElementSuccess', { type: 'category', name: category.name})
-        this.dispatch("getCategories")
-      })
-      .catch(e => {
-        console.log('requete post echoué', category)
-        console.log(e)
-      })
+      Category.addCategory(category)
+        .then(() => {
+          commit('addElementSuccess', { type: 'category', name: category.name})
+          this.dispatch("getCategories")
+        })
+        .catch(e => {
+          console.log('requete post echoué', category)
+          console.log(e)
+        })
+    },
+    updateCategory({ commit }, categoryId, category) {
+      Category.updateCategory(categoryId, category)
+        .then(() => {
+          commit('updateElementSuccess', { type: 'category', name: category.name})
+          this.dispatch("getCategories")
+        })
+        .catch(e => {
+          console.log('requete post echoué', category)
+          console.log(e)
+        })
+    },
+    addProduct({ commit }, product) {
+      Product.addOneProduct(product)
+        .then(() => {
+          commit('addElementSuccess', { type: 'product', name: product.name})
+          this.dispatch("getProducts")
+        })
+        .catch(e => {
+          console.log('requete post echoué', product)
+          console.log(e)
+        })
     },
     resetAddElement({ commit }) {
       commit('resetAddElement')
+    },
+    resetUpdateElement({ commit }) {
+      commit('resetUpdateElement')
     }
   },
   modules: {

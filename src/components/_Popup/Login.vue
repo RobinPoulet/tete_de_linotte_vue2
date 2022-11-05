@@ -38,7 +38,7 @@
         :disabled="!valid"
         color="success"
         class="mr-4"
-        @click="validate"
+        @click="login"
       >
         Validate
       </v-btn> 
@@ -64,7 +64,7 @@
 </template>
   
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import {  mapGetters } from 'vuex'
 export default {
     data () {
       return {
@@ -93,14 +93,15 @@ export default {
         const { email, password } = this
         await this.$store.dispatch('login', { email, password })
       },
-      ...mapActions({
-        
-      }),
-      validate() {
-        if (this.$refs.form.validate()) {
-          this.login()
-        }
-      }
+      // ...mapActions({
+      //   login: 'login'
+      // }),
+      // validate() {
+      //   if (this.$refs.form.validate()) {
+      //     console.log('toto')
+      //     this.login()
+      //   }
+      // }
     }
 }
 </script>
