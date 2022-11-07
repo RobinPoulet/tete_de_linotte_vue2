@@ -33,15 +33,24 @@ import { mapGetters } from 'vuex'
 export default {
     name: "App",
     created() {
-        this.$store.dispatch("getProducts"); // dispatch loading
-		this.$store.dispatch("getCategories"); 
+        this.$store.dispatch("getAllProducts"); // dispatch loading
+		this.$store.dispatch("getAllCategories"); 
     },
     components: { Navbar, Footer, Popup, Login, Signup },
     computed: {
 		...mapGetters ({
 			popupVisible: 'isVisible',
-			popupMode: 'getMode'
+			popupMode: 'getMode',
+			apiStatus: 'apiStatus',
+			apiErrors: 'getApiErrors'
 		})
+	},
+	watch: {
+		apiStatus: function (newStatus) {
+			if (newStatus === 'error') {
+				this.$toastr.e(`${this.apiErrors.name} : ${this.apiErrors.message}`, `${this.apiErrors.apiCall}`);
+			}
+		}
 	}
 }
 </script>

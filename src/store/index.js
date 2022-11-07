@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Cookies from 'vue-universal-cookies'
-import Category from '../../api/category'
+import Category from '../../services/CategoryService'
 import Product from '../../api/product'
 import User from '../../api/user'
 
@@ -17,8 +17,8 @@ export default new Vuex.Store({
     status: '',
     authenticated: false,
     errors: [],
-    addElement: {isAddElement : "none", elementAdd: {}},
-    updateElement: {isUpdateElement : "none", elementUpdate: {}}
+    apiStat: '',
+    apiErrors: {},
   },
   getters: {
     getAllProducts: (state) => state.products,
@@ -28,9 +28,9 @@ export default new Vuex.Store({
     getMode: (state) => state.modalMode,
     isAuthenticated: (state) => state.authenticated,
     authStatus: (state) => state.status,
+    apiStatus: (state) => state.apiStat,
+    getApiErrors: (state) => state.apiErrors,
     getErrors: (state) => state.errors,
-    isAddElement: (state) => state.addElement,
-    isUpdateElement: (state) => state.updateElement
   },
   mutations: {
     SET_PRODUCTS(state, products) {
@@ -67,6 +67,12 @@ export default new Vuex.Store({
         state.authenticated = false;
         state.errors        = errors;
     },
+    SET_API_STATUS: (state, status) => {
+      state.apiStat = status;
+    },
+    SET_API_ERRORS: (state, errors) => {
+        state.apiErrors = errors;
+    },
     logout: (state) => {
         state.status        = '';
         state.authenticated = false;
@@ -78,35 +84,31 @@ export default new Vuex.Store({
         state.status = '';
         state.errors =  [];
     },
-    addElementSuccess: (state, element) => {
-      state.addElement = {isAddElement: "success", elementAdd: element};
-    },
-    updateElementSuccess: (state, element) => {
-      state.updateElement = {isUpdateElement: "success", elementUpdate: element};
-    },
-    resetAddElement: (state) => {
-      state.addElement = {isAddElement: "none", elementAdd: {}};
-    },
-    resetUpdateElement: (state) => {
-      state.updateElement = {isUpdateElement: "none", elementUpdate: {}};
-    }
   },
   actions: {
-    getProducts({commit}) {
-      Product.getAllProducts()
+    getAllProducts({commit}) {
+      Product.getAll()
         .then(response => {
           commit('SET_PRODUCTS', response.data.products);
           commit('SET_LOADING', false);
+          commit('SET_API_STATUS', "success");
         })
-        .catch(e => console.log(e))
+        .catch(err => {
+          commit('SET_API_STATUS', "error")
+          commit('SET_API_ERRORS', {apiCall: 'getAllProducts', name: err.name, message: err.message});
+        });
     },
-    getCategories({commit}) {
-      Category.getAllCategories()
+    getAllCategories({commit}) {
+      Category.getAll()
         .then(response => {
-          commit('SET_CATEGORIES', response.data.categories);
+          commit('SET_CATEGORIES', response.categories);
           commit('SET_LOADING', false);
+          commit('SET_API_STATUS', "success")
         })
-        .catch(e => console.log(e))
+        .catch(err => {
+          commit('SET_API_STATUS', "error")
+          commit('SET_API_ERRORS', {apiCall: 'getAllCategories', name: err.name, message: err.message});
+        });
     },
     show: ({ commit }) => {
       return new Promise((resolve) => {
@@ -179,45 +181,6 @@ export default new Vuex.Store({
     setAuthenticated: async function({ commit }) {
         commit('authSuccess');
     },
-    addCategory({ commit }, category) {
-      Category.addCategory(category)
-        .then(() => {
-          commit('addElementSuccess', { type: 'category', name: category.name})
-          this.dispatch("getCategories")
-        })
-        .catch(e => {
-          console.log('requete post echoué', category)
-          console.log(e)
-        })
-    },
-    updateCategory({ commit }, categoryId, category) {
-      Category.updateCategory(categoryId, category)
-        .then(() => {
-          commit('updateElementSuccess', { type: 'category', name: category.name})
-          this.dispatch("getCategories")
-        })
-        .catch(e => {
-          console.log('requete post echoué', category)
-          console.log(e)
-        })
-    },
-    addProduct({ commit }, product) {
-      Product.addOneProduct(product)
-        .then(() => {
-          commit('addElementSuccess', { type: 'product', name: product.name})
-          this.dispatch("getProducts")
-        })
-        .catch(e => {
-          console.log('requete post echoué', product)
-          console.log(e)
-        })
-    },
-    resetAddElement({ commit }) {
-      commit('resetAddElement')
-    },
-    resetUpdateElement({ commit }) {
-      commit('resetUpdateElement')
-    }
   },
   modules: {
   }

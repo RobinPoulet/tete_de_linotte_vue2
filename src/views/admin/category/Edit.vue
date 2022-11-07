@@ -33,7 +33,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios';
+import Category from '../../../../services/CategoryService'
 
 export default {
     name: 'CategoryEditView',
@@ -65,29 +65,31 @@ export default {
           description: this.description
         };
         this.editAction === 'create' ? 
-        this.$store.dispatch('addCategory', category) :
-        this.$store.dispatch('updateCategory', this.category._id, category)
+          Category.add(category)
+            .then(() => {
+              this.$store.dispatch("getAllCategories")
+              this.$toastr.s(`${category.name} a été ajoutée avec succès`);
+              this.$router.push('/admin/category/list');
+            })
+            .catch(err => {
+              this.$toastr.e(`${err.name} : ${err.message}`);
+              this.$router.push('/admin/category/list');
+            })
+          :
+          Category.update(this.category._id, category)
+            .then(() => {
+              this.$store.dispatch("getAllCategories")
+              this.$toastr.s(`${category.name} a été modifiée avec succès`);
+              this.$router.push('/admin/category/list');
+            })
+            .catch(err => {
+              this.$toastr.e(`${err.name} : ${err.message}`);
+              this.$router.push('/admin/category/list');
+            })
       },
       clear () {
         this.name = ''
         this.description = ''
-      },
-    },
-
-    watch: {
-      isAddElement(value) {
-        if (value.isAddElement === "success") {
-            this.$toastr.s("SUCCESS", `${value.elementAdd.type} : ${value.elementAdd.name} created`)
-            this.$store.dispatch("resetAddElement")
-            this.$router.push('/admin/category/list')
-        }
-      },
-      isUpdateElement(value) {
-        if (value.isUpdateElement === "success") {
-            this.$toastr.s("SUCCESS", `${value.elementUpdate.type} : ${value.elementUpdate.name} updated`)
-            this.$store.dispatch("resetUpdateElement")
-            this.$router.push('/admin/category/list')
-        }
       },
     },
 

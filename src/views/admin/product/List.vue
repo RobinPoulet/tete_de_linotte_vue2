@@ -144,7 +144,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios';
+import Product from '../../../../services/ProductService'
 import swal from 'sweetalert';
 export default {
     name: "AdminView",
@@ -204,21 +204,15 @@ export default {
                     },
                 },
             )
-            .then(
-                () => {
-                    axios
-                        .delete(`https://api-tdl-backend.herokuapp.com/${product._id}`)
-                        .then(
-                            () => {
-                                this.$toastr.s(`${product.name}`, "Article supprimé");
-                                this.$store.dispatch("getProducts");
-                            }
-                        )
-                        .catch(
-                            e => this.$toastr.e(`Error : ${e.message}`)
-                        );
+            .then(() => {
+                Product.delete(product._id)
+                    .then(() => {
+                            this.$toastr.s(`${product.name}`, "Produit supprimée");
+                            this.$store.dispatch("getAllProducts");
+                        }
+                    )
+                    .catch(err => this.$toastr.e(`${err.name} : ${err.message}`));
                 }
-        
             )
         }
            

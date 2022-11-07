@@ -101,8 +101,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios';
 import swal from 'sweetalert';
+import Category from '../../../../services/CategoryService'
 export default {
     name: "AdminCategoryList",
     data() {
@@ -143,21 +143,15 @@ export default {
                     closeModal: true
                 },
             )
-            .then(
-                () => {
-                    axios
-                        .delete(`https://api-tdl-backend.herokuapp.com/api/category/${category._id}`)
-                        .then(
-                            () => {
-                                this.$toastr.s(`${category.name}`, "Catégorie supprimée");
-                                this.$store.dispatch("getCategories");
-                            }
-                        )
-                        .catch(
-                            e => this.$toastr.e(`Error : ${e.message}`)
-                        );
+            .then(() => {
+                Category.delete(category._id)
+                    .then(() => {
+                            this.$toastr.s(`${category.name}`, "Catégorie supprimée");
+                            this.$store.dispatch("getAllCategories");
+                        }
+                    )
+                    .catch(err => this.$toastr.e(`${err.name} : ${err.message}`));
                 }
-        
             )
         }
            

@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { mapGetters } from 'vuex'
+import Product from '../../../../services/ProductService'
 export default {
   name: 'ProductEditView',
   props: {
@@ -111,7 +111,6 @@ export default {
       },
       ...mapGetters({
         categories: 'getAllCategories',
-        isAddElement: 'isAddElement'
       }),
   },
   methods: {
@@ -123,28 +122,35 @@ export default {
               price: this.price,
               inStock: this.checkbox,
             };
+
         const productData = new FormData();
         productData.append('product', JSON.stringify(product));
         productData.append('image', this.image, product.name);
-        if (this.editAction === 'create') {
-          this.$store.dispatch('addProduct', productData)
-          axios.post("https://api-tdl-backend.herokuapp.com/api/product", productData)
+
+        this.editAction === 'create' ?
+          Product.add(productData)
             .then(() => {
-              this.$toastr.s("SUCCESS", `${this.name} created`)
-              this.$store.dispatch('getProducts')
+              this.$store.dispatch('getAllProducts')
+              this.$toastr.s(`${product.name} a été ajoutée avec succès`)
               this.$router.push('/admin/products/list')
             }) 
-            .catch(e => this.$toastr.e(`Error : ${e.message}`))
-        } else {
-          axios.put(`https://api-tdl-backend.herokuapp.com/api/product/${this.product._id}`, productData)
+            .catch(err => {
+                this.$toastr.e(`${err.name} : ${err.message}`);
+                this.$router.push('/admin/products/list');
+              }
+            )
+          :
+          Product.update(this.product._id, productData)
             .then(() => {
-              this.$toastr.s("SUCCESS", `${this.name} updated`);
-              this.$store.dispatch('getProducts')
+              this.$store.dispatch('getAllProducts')
+              this.$toastr.s(`${product.name} a été modifiée avec succès`)
               this.$router.push('/admin/products/list')
-            })
-            .catch(e => this.$toastr.e(`Error : ${e.message}`))
-        }
-          
+            }) 
+            .catch(err => {
+                this.$toastr.e(`${err.name} : ${err.message}`);
+                this.$router.push('/admin/products/list');
+              }
+            )  
       },
       clear () {
           this.name = ''
@@ -165,16 +171,6 @@ export default {
         this.image = e.target.files[0];
         this.isEditImage = false;
       },
-  },
-
-  watch: {
-    isAddElement(value) {
-      if (value.isAddElement === "success") {
-          this.$toastr.s("SUCCESS", `${value.elementAdd.type} : ${value.elementAdd.name} created`)
-          this.$store.dispatch("resetAddElement")
-          this.$router.push('/admin/product/list')
-      }
-    }
   },
 
   mounted () {
