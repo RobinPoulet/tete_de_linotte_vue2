@@ -2,8 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Cookies from 'vue-universal-cookies'
 import Category from '../../services/CategoryService'
-import Product from '../../api/product'
-import User from '../../api/user'
+import Product from '../../services/ProductService'
+import User from '../../services/UserService'
 
 Vue.use(Vuex)
 
