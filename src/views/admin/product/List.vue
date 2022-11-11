@@ -96,9 +96,9 @@
                         <td> {{ product.description }} </td>
                         <td> {{ product.price }} € </td>
                         <td>
-                            <div v-if="product.imageUrl" style="padding:5px;">
+                            <div v-if="product.avatarUrl" style="padding:5px;">
                                 <img
-                                    :src="product.imageUrl"
+                                    :src="product.avatarUrl"
                                     style="width: 80px; height: 80px;"
                                 />
                             </div>
@@ -111,8 +111,7 @@
                                 :to="{
                                     name: 'productEdit',
                                     params: {
-                                        product: product,
-                                        editAction: edit
+                                        id: product._id,
                                     }
                                 }"
                                 style="text-decoration: none; color: inherit;"

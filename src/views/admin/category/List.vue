@@ -66,8 +66,7 @@
                                 :to="{
                                     name: 'categoryEdit',
                                     params: {
-                                        category: category,
-                                        editAction: edit
+                                        id: category._id
                                     }
                                 }"
                                 style="text-decoration: none; color: inherit;"

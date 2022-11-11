@@ -39,11 +39,12 @@ export default {
     name: 'CategoryEditView',
 
     props: {
-      category: Object,
-      editAction: String,
+      id: String
     },
 
     data: () => ({
+        category: {},
+        editAction: 'create',
         name: '',
         description: '',
     }),
@@ -53,8 +54,7 @@ export default {
             return this.name !== '' && this.description !== ''
         },
         ...mapGetters({
-            isAddElement: 'isAddElement',
-            isUpdateElement: 'isUpdateElement',
+            categories: 'getAllCategories',
         }),
     },
 
@@ -94,9 +94,12 @@ export default {
     },
 
     mounted () {
-      if (this.category !== null) {
-          this.name = this.category.name
-          this.description = this.category.description
+      if (this.id) {
+          this.category = this.categories.find(c => c._id === this.id);
+          Object.keys(this.category).forEach(key => {
+            this[key] = this.category[key];
+          });
+          this.editAction = 'edit';
       }
     },
 }

@@ -89,7 +89,7 @@ export default new Vuex.Store({
     getAllProducts({commit}) {
       Product.getAll()
         .then(response => {
-          commit('SET_PRODUCTS', response.data.products);
+          commit('SET_PRODUCTS', response.products);
           commit('SET_LOADING', false);
           commit('SET_API_STATUS', "success");
         })

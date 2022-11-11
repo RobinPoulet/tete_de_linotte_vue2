@@ -49,7 +49,7 @@ const routes = [
     component: ProductList
   },
   {
-    path: '/admin/products/edit',
+    path: '/admin/products/edit/:id',
     name: 'productEdit',
     component: ProductEdit,
     props: true
@@ -60,7 +60,7 @@ const routes = [
     component: CategoryList
   },
   {
-    path: '/admin/category/edit',
+    path: '/admin/category/edit/:id',
     name: 'categoryEdit',
     component: CategoryEdit,
     props: true
