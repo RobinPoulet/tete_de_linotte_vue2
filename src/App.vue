@@ -4,11 +4,11 @@
 	
 	<Navbar />
 	
-    
+   
 	<v-main>
 		
 		<v-container fluid>
-
+			
 			<router-view></router-view>
 			<router-view name="helper"/>
 		</v-container>

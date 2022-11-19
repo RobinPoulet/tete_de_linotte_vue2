@@ -1,44 +1,25 @@
 <template>
     <div class="admin">
-
-        <v-card
-            class="mx-auto"
-            max-width="300"
-            tile
-        >
-            <v-list dense>
-                <v-subheader>ADMIN</v-subheader>
-                <v-list-item-group
-                    color="primary"
-                >
-                    <v-list-item
-                        v-for="(item, i) in items"
-                        :key="i"
-                    >
-                        <v-list-item-icon>
-                            <v-icon v-text="item.icon"></v-icon>
-                        </v-list-item-icon>
-                        <v-list-item-content>
-                            <router-link
-                                :to="{
-                                    name: item.routerLinkName,
-                                }"
-                                style="text-decoration: none; color: inherit;"
-                            > 
-                                {{ item.text }}   
-                            </router-link>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list-item-group>
-            </v-list>
-        </v-card>
-        
+        <v-container fluid>
+            <v-row>
+                <v-col cols="12" md="2">
+                    <AdminLeftBar />
+                </v-col>
+                <v-col cols="12" md="10">
+                   <router-view></router-view>
+                </v-col>
+            </v-row>
+        </v-container>
     </div>
 </template>
 
 <script>
+import AdminLeftBar from './../../components/AdminLeftBar.vue'
 export default {
     name: "AdminView",
+    components: {
+        AdminLeftBar,
+    },
     data: () => ({
         items: [
             { text: 'Product', icon: 'mdi-clock', routerLinkName: 'productList'},

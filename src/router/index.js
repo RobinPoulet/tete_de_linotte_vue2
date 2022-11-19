@@ -30,7 +30,37 @@ const routes = [
   {
     path: '/admin',
     name: 'admin',
-    component: Admin
+    component: Admin,
+    children: [
+      {
+        path: '/admin/products/list',
+        name: 'productList',
+        component: ProductList
+      },
+      {
+        path: '/admin/products/edit/:id',
+        name: 'productEdit',
+        component: ProductEdit,
+        props: true
+      },
+      {
+        path: '/admin/category/list',
+        name: 'categoryList',
+        component: CategoryList
+      },
+      {
+        path: '/admin/category/edit/:id',
+        name: 'categoryEdit',
+        component: CategoryEdit,
+        props: true
+      },
+      {
+        path: '/admin/category/:id',
+        name: 'categoryShow',
+        component: CategoryShow,
+        props: true
+      }
+    ]
   },
   {
     path: '/products',
@@ -42,35 +72,7 @@ const routes = [
     name: 'product',
     component: Product,
     props: true
-  },
-  {
-    path: '/admin/products/list',
-    name: 'productList',
-    component: ProductList
-  },
-  {
-    path: '/admin/products/edit/:id',
-    name: 'productEdit',
-    component: ProductEdit,
-    props: true
-  },
-  {
-    path: '/admin/category/list',
-    name: 'categoryList',
-    component: CategoryList
-  },
-  {
-    path: '/admin/category/edit/:id',
-    name: 'categoryEdit',
-    component: CategoryEdit,
-    props: true
-  },
-  {
-    path: '/admin/category/:id',
-    name: 'categoryShow',
-    component: CategoryShow,
-    props: true
-  },
+  }
 ]
 
 const router = new VueRouter({
