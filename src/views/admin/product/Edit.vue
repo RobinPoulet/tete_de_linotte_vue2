@@ -55,7 +55,7 @@
               ref="uploader"
               class="d-none"
               type="file"
-              @change="handleFileChange($event)"
+              @change="getAvatarUrl($event)"
             >
           </v-btn>
         </div>
@@ -150,7 +150,7 @@ export default {
               categoryId: this.categoryId,
               description: this.description,
               price: this.price,
-              inStock: this.checkbox,
+              inStock: this.inStock,
               avatarUrl: this.avatarUrl,
             };
 
@@ -208,6 +208,7 @@ export default {
       this.formData.append("upload_preset", this.preset);
       this.formData.append("tags", this.tags); // Optional - add tag for image admin in Cloudinary
       this.formData.append("file", this.fileContents);
+      console.log(this.formData)
     },
     getAvatarUrl() {
         //no need to look at selected files if there is no cloudname or preset

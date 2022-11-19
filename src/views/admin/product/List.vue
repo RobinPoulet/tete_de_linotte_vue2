@@ -6,8 +6,7 @@
                 :to="{
                     name: 'productEdit',
                     params: {
-                        product: null,
-                        editAction: create
+                        id: 'create',
                     }
                 }"
                 style="text-decoration: none; color: inherit;"
