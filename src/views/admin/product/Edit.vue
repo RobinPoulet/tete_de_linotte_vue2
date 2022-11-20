@@ -37,30 +37,8 @@
           type="checkbox"
         ></v-checkbox>
 
-        <div  v-if="isEditImage">
-        <v-img
-          :src="product.avatarUrl"
-          max-width="200"
-          max-height="200"
-        >
-        </v-img>
-        <v-btn
-            color="primary"
-            rounded
-            dark
-            :loading="isSelecting"
-            @click="handleFileImport"
-          > Edit
-            <input
-              ref="uploader"
-              class="d-none"
-              type="file"
-              @change="getAvatarUrl($event)"
-            >
-          </v-btn>
-        </div>
+      
         <v-file-input
-          v-else
           v-model="image"
           :rules="rules"
           accept="image/png, image/jpeg, image/bmp"
@@ -68,6 +46,7 @@
           prepend-icon="mdi-camera"
           label="Avatar"
           @change="getAvatarUrl($event)"
+          :disabled="isDisabledFileInput"
         ></v-file-input>
 
         <!-- display uploaded image if successful -->
@@ -79,6 +58,30 @@
           max-height="200"
         >
         </v-img>
+        
+        <!-- display exsiting image on product edit with already image upload -->
+        <v-container v-if="isEditImage">
+          <v-row>
+            <v-col cols="3">
+              <v-img
+                :src="product.avatarUrl"
+                alt=""
+                max-width="100"
+                max-height="100"
+              >
+              </v-img>
+            </v-col>
+            <v-col cols="3">
+              <v-btn 
+                @click="deleteImage"
+              >
+                <v-icon color="red">
+                  mdi-delete
+                </v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-container>
 
         <v-btn
           class="mr-4"
@@ -105,6 +108,7 @@
 import { mapGetters } from 'vuex'
 import Product from '../../../../services/ProductService'
 import axios from 'axios'
+
 export default {
   name: 'ProductEditView',
   props: {
@@ -141,6 +145,9 @@ export default {
         categories: 'getAllCategories',
         products: 'getAllProducts',
       }),
+      isDisabledFileInput() {
+        return this.avatarUrl!== '' || this.product.avatarUrl !== ''
+      }
   },
   methods: {
       submit () {
@@ -254,6 +261,12 @@ export default {
       if (this.image && this.image.name) {
         reader.readAsDataURL(this.image);
       }
+    },
+    deleteImage() {
+      this.avatarUrl = '';
+      this.product.avatarUrl = '';
+      this.image = null;
+      this.isEditImage = false;  
     },
   },
 
