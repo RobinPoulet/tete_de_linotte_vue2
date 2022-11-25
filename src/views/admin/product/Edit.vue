@@ -146,7 +146,7 @@ export default {
         products: 'getAllProducts',
       }),
       isDisabledFileInput() {
-        return this.avatarUrl!== '' || this.product.avatarUrl !== ''
+        return this.editAction !== 'create' && (this.avatarUrl!== '' || this.product.avatarUrl !== '')
       }
   },
   methods: {
