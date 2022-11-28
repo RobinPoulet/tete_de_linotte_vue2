@@ -4,6 +4,11 @@ const url = "https://api-tdl-backend.herokuapp.com/api/product";
 
 export default  {
 
+    getOne: async(id) => {
+        const response = await axios.get(`${url}/${id}`);
+        return response.data;
+    },
+
     getAll: async() => {
         const response = await axios.get(url);
         return response.data;

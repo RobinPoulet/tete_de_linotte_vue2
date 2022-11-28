@@ -44,6 +44,12 @@ const routes = [
         props: true
       },
       {
+        path: '/admin/products/create',
+        name: 'productCreate',
+        component: ProductEdit,
+        props: true
+      },
+      {
         path: '/admin/category/list',
         name: 'categoryList',
         component: CategoryList
@@ -53,6 +59,11 @@ const routes = [
         name: 'categoryEdit',
         component: CategoryEdit,
         props: true
+      },
+      {
+        path: '/admin/category/create',
+        name: 'categoryCreate',
+        component: CategoryEdit,
       },
       {
         path: '/admin/category/:id',

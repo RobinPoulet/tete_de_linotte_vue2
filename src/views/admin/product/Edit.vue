@@ -112,11 +112,15 @@ import axios from 'axios'
 export default {
   name: 'ProductEditView',
   props: {
-    id: String,
+    id: {
+      type: String
+    },
+    product: {
+      type: Object
+    }
   },
   data: () => ({
-      product: {},
-      editAction: 'create',
+      editAction: '',
       results: null,
       name: '',
       description: '',
@@ -135,7 +139,8 @@ export default {
       formData: null,
       cloudName: "delfxt4yn",
       preset: "vuejs-preset",
-      errors: []
+      errors: [],
+      isLoadingApi: false,
   }),
   computed: {
       isEnableSubmit() {
@@ -144,73 +149,70 @@ export default {
       ...mapGetters({
         categories: 'getAllCategories',
         products: 'getAllProducts',
+        isLoading: 'isLoading'
       }),
       isDisabledFileInput() {
         return this.editAction !== 'create' && (this.avatarUrl!== '' || this.product.avatarUrl !== '')
       }
   },
   methods: {
-      submit () {
-      
-                const product = {
-              name: this.name,
-              categoryId: this.categoryId,
-              description: this.description,
-              price: this.price,
-              inStock: this.inStock,
-              avatarUrl: this.avatarUrl,
-            };
+    submit () { 
+      const product = {
+        name: this.name,
+        categoryId: this.categoryId,
+        description: this.description,
+        price: this.price,
+        inStock: this.inStock,
+        avatarUrl: this.avatarUrl,
+      };
 
-        this.editAction === 'create' ?
-          Product.add(product)
-            .then(() => {
-              this.$store.dispatch('getAllProducts')
-              this.$toastr.s(`${product.name} a été ajoutée avec succès`)
-              this.$router.push('/admin/products/list')
-            }) 
-            .catch(err => {
-                this.$toastr.e(`${err.name} : ${err.message}`);
-                this.$router.push('/admin/products/list');
-              }
-            )
-          :
-          Product.update(this.product._id, product)
-            .then(() => {
-              this.$store.dispatch('getAllProducts')
-              this.$toastr.s(`${product.name} a été modifiée avec succès`)
-              this.$router.push('/admin/products/list')
-            }) 
-            .catch(err => {
-                this.$toastr.e(`${err.name} : ${err.message}`);
-                this.$router.push('/admin/products/list');
-              }
-            )  
-             
-  
-       
-      },
-      clear () {
-          this.name = ''
-          this.categoryId = ''
-          this.description = ''
-          this.price = ''
-          this.checkbox = 0
-      },
-      handleFileImport() {
-        this.isSelecting = true;
+      this.editAction === 'create' ?
+        Product.add(product)
+          .then(() => {
+            this.$store.dispatch('getAllProducts')
+            this.$toastr.s(`${product.name} a été ajoutée avec succès`)
+            this.$router.push('/admin/products/list')
+          }) 
+          .catch(err => {
+              this.$toastr.e(`${err.name} : ${err.message}`);
+              this.$router.push('/admin/products/list');
+            }
+          )
+        :
+        Product.update(this.product._id, product)
+          .then(() => {
+            this.$store.dispatch('getAllProducts')
+            this.$toastr.s(`${product.name} a été modifiée avec succès`)
+            this.$router.push('/admin/products/list')
+          }) 
+          .catch(err => {
+              this.$toastr.e(`${err.name} : ${err.message}`);
+              this.$router.push('/admin/products/list');
+            }
+          )  
+    },
+    clear () {
+      this.name = ''
+      this.categoryId = ''
+      this.description = ''
+      this.price = ''
+      this.checkbox = 0
+    },
+    handleFileImport() {
+      this.isSelecting = true;
 
-        window.addEventListener('focus', () => {
-          this.isSelecting = false;
-        }, {once: true});
-        this.$refs.uploader.click();
-      },
-      handleFileChange(event) {
+      window.addEventListener('focus', () => {
+        this.isSelecting = false;
+      }, {once: true});
+      this.$refs.uploader.click();
+    },
+    handleFileChange(event) {
       console.log("handlefilechange", event.target.files);
       //returns an array of files even though multiple not used
       this.file = event.target.files[0];
       this.filesSelected = event.target.files.length;
     },
-    prepareFormData: function() {
+    prepareFormData() {
       this.formData = new FormData();
       this.formData.append("upload_preset", this.preset);
       this.formData.append("tags", this.tags); // Optional - add tag for image admin in Cloudinary
@@ -218,45 +220,45 @@ export default {
       console.log(this.formData)
     },
     getAvatarUrl() {
-        //no need to look at selected files if there is no cloudname or preset
-        if (this.preset.length < 1 || this.cloudName.length < 1) {
-          this.errors.push("You must enter a cloud name and preset to upload");
-          return;
-        }
-        // clear errors
-        else {
-          this.errors = [];
-        }
-        console.log("upload", this.image.name);
+      //no need to look at selected files if there is no cloudname or preset
+      if (this.preset.length < 1 || this.cloudName.length < 1) {
+        this.errors.push("You must enter a cloud name and preset to upload");
+        return;
+      }
+      // clear errors
+      else {
+        this.errors = [];
+      }
+      console.log("upload", this.image.name);
 
-        let reader = new FileReader();
-        // attach listener to be called when data from file
-        reader.addEventListener(
-          "load",
-          function() {
-            this.fileContents = reader.result;
-            this.prepareFormData();
-            let cloudinaryUploadURL = `https://api.cloudinary.com/v1_1/${this.cloudName}/upload`;
-            let requestObj = {
-              url: cloudinaryUploadURL,
-              method: "POST",
-              data: this.formData,
-            };
-            //show progress bar at beginning of post
-            axios(requestObj)
-              .then(response => {
-                this.results = response.data;
-                console.log(this.results);
-                console.log("public_id", this.results.public_id);
-                this.avatarUrl = this.results.secure_url;
-              })
-              .catch(error => {
-                this.errors.push(error);
-                console.log(this.error);
-              })
-        }.bind(this),
-        false
-      );
+      let reader = new FileReader();
+      // attach listener to be called when data from file
+      reader.addEventListener(
+        "load",
+        function() {
+          this.fileContents = reader.result;
+          this.prepareFormData();
+          let cloudinaryUploadURL = `https://api.cloudinary.com/v1_1/${this.cloudName}/upload`;
+          let requestObj = {
+            url: cloudinaryUploadURL,
+            method: "POST",
+            data: this.formData,
+          };
+          //show progress bar at beginning of post
+          axios(requestObj)
+            .then(response => {
+              this.results = response.data;
+              console.log(this.results);
+              console.log("public_id", this.results.public_id);
+              this.avatarUrl = this.results.secure_url;
+            })
+            .catch(error => {
+              this.errors.push(error);
+              console.log(this.error);
+            })
+      }.bind(this),
+      false
+    );
       // call for file read if there is a file
       if (this.image && this.image.name) {
         reader.readAsDataURL(this.image);
@@ -264,7 +266,6 @@ export default {
     },
     deleteImage() {
       this.avatarUrl = '';
-      this.product.avatarUrl = '';
       this.image = null;
       this.isEditImage = false;  
     },
@@ -273,7 +274,6 @@ export default {
   watch: {
     product(value) {
       if (Object.keys(value).length === 0 && value.constructor === Object) {
-        this.product = this.products.find(product => product._id === this.id);
         Object.keys(this.product).forEach(key => {
           this[key] = this.product[key]
         });
@@ -284,14 +284,32 @@ export default {
   },
   
   mounted () {
-    if (this.id) {
-      this.product = this.products.find(product => product._id === this.id);
-      Object.keys(this.product).forEach(key => {
-        this[key] = this.product[key]
-      });
-      this.isEditImage = Object.prototype.hasOwnProperty.call(this.product, 'avatarUrl') && this.product.avatarUrl !== '';
-      this.editAction = 'edit'
+    this.editAction = this.$route.name === 'productCreate' ? 'create' : 'edit'
+    if (this.$route.name === 'productEdit' && !this.product) {
+      this.isLoadingApi = true;
+      Product.getOne(this.$route.params.id)
+          .then(product => {
+            this.avatarUrl = product.product.avatarUrl;
+            this.categoryId = product.product.categoryId;
+            this.description = product.product.description;
+            this.inStock = product.product.inStock;
+            this.name = product.product.name;
+            this.price = product.product.price;
+            this.isLoadingApi = false;
+          })
+          .catch(err => {
+            this.$toastr.e(`${err.name} : ${err.message}`);
+            this.$router.push('/admin/product/list');
+          })
     }
+    if (this.$route.name === 'productEdit' &&  this.product) {
+        this.avatarUrl = this.product.avatarUrl;
+        this.description = this.product.description;
+        this.categoryId = this.product.categoryId;
+        this.inStock = this.product.inStock;
+        this.name = this.product.name;
+        this.price = this.product.price;
+      }
   },
 
 }

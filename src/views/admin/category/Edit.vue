@@ -1,9 +1,13 @@
 <template>
     <div class="category-edit">
     
-        <h3> {{ editAction}} catégorie</h3>
+        <h3> {{ editAction}} catégorie  </h3>
+
+        <v-container v-if="isLoading || isLoadingApi">
+          ...
+        </v-container>
         
-        <form @submit.prevent="submit" class="form-valid">
+        <form @submit.prevent="submit" class="form-valid" v-else>
     
           <v-text-field
             v-model="name"
@@ -39,14 +43,21 @@ export default {
     name: 'CategoryEditView',
 
     props: {
-      id: String
+      id: {
+        type: String,
+        required: false
+      },
+      category: {
+        type: Object,
+        required: false,
+      }
     },
 
     data: () => ({
-        category: {},
-        editAction: 'create',
+        editAction: '',
         name: '',
         description: '',
+        isLoadingApi: false,
     }),
 
     computed: {
@@ -55,6 +66,7 @@ export default {
         },
         ...mapGetters({
             categories: 'getAllCategories',
+            isLoading: 'isLoading'
         }),
     },
 
@@ -94,12 +106,23 @@ export default {
     },
 
     mounted () {
-      if (this.id) {
-          this.category = this.categories.find(c => c._id === this.id);
-          Object.keys(this.category).forEach(key => {
-            this[key] = this.category[key];
-          });
-          this.editAction = 'edit';
+      this.editAction = this.$route.name === 'categoryCreate' ? 'create' : 'edit'
+      if (this.$route.name === 'categoryEdit' && !this.category) {
+        this.isLoadingApi = true;
+        Category.getOne(this.$route.params.id)
+          .then(category => {
+            this.name = category.category.name
+            this.description = category.category.description
+            this.isLoadingApi = false;
+          })
+          .catch(err => {
+            this.$toastr.e(`${err.name} : ${err.message}`);
+            this.$router.push('/admin/category/list');
+          })
+      }
+      if (this.$route.name === 'categoryEdit' &&  this.category) {
+        this.name = this.category.name
+        this.description = this.category.description
       }
     },
 }

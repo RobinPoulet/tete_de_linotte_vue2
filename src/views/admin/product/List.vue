@@ -4,10 +4,7 @@
         <div style="text-align: right; margin-bottom: 10px;">
             <router-link
                 :to="{
-                    name: 'productEdit',
-                    params: {
-                        id: 'create',
-                    }
+                    name: 'productCreate',
                 }"
                 style="text-decoration: none; color: inherit;"
             >
@@ -111,6 +108,7 @@
                                     name: 'productEdit',
                                     params: {
                                         id: product._id,
+                                        product: product
                                     }
                                 }"
                                 style="text-decoration: none; color: inherit;"

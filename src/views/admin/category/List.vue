@@ -4,11 +4,7 @@
         <div style="text-align: right; margin-bottom: 10px;">
             <router-link
                 :to="{
-                    name: 'categoryEdit',
-                    params: {
-                        category: null,
-                        editAction: create
-                    }
+                    name: 'categoryCreate',
                 }"
                 style="text-decoration: none; color: inherit;"
             >
@@ -44,11 +40,11 @@
                         <td>
                             <router-link 
                                 :to="{
-                                  name: 'categoryShow', 
+                                  name: 'categoryShow',
                                   params: {
                                     id: category._id,
                                     category: category
-                                  }
+                                  } 
                                 }"
                                 style="text-decoration: none; color: inherit;"
                             > 
@@ -66,7 +62,8 @@
                                 :to="{
                                     name: 'categoryEdit',
                                     params: {
-                                        id: category._id
+                                        id: category._id,
+                                        category: category
                                     }
                                 }"
                                 style="text-decoration: none; color: inherit;"
