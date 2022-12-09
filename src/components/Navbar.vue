@@ -27,7 +27,7 @@
       </v-menu>
      
 
-      <v-toolbar-title><h3>{{ viewName }}</h3></v-toolbar-title>
+      <v-toolbar-title></v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -67,9 +67,7 @@ export default {
         ...mapGetters({
             popupMode: "getMode"
         }),
-        viewName() {
-            return this.$route.name;
-        }
+       
     },
 }
 </script>

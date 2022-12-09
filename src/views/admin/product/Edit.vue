@@ -1,6 +1,14 @@
 <template>
   <div class="product-edit">
+
+    <v-container v-if="isLoading || isLoadingApi">
+      <v-progress-circular indeterminate color="primary">
+
+      </v-progress-circular>
+    </v-container> 
   
+    <v-container v-else>
+
       <h3> {{ editAction}} product</h3>
       
       <form @submit.prevent="submit">
@@ -38,32 +46,34 @@
         ></v-checkbox>
 
       
-        <v-file-input
-          v-model="image"
-          :rules="rules"
-          accept="image/png, image/jpeg, image/bmp"
-          placeholder="Pick an avatar"
-          prepend-icon="mdi-camera"
-          label="Avatar"
-          @change="getAvatarUrl($event)"
-          :disabled="isDisabledFileInput"
-        ></v-file-input>
+        <v-container v-if="!isEditImage">
+          <v-file-input
+            v-model="image"
+            :rules="rules"
+            accept="image/png, image/jpeg, image/bmp"
+            placeholder="Pick an avatar"
+            prepend-icon="mdi-camera"
+            label="Avatar"
+            @change="getAvatarUrl($event)"
+          ></v-file-input>
 
-        <!-- display uploaded image if successful -->
-        <v-img
-          v-if="results && results.secure_url"
-          :src="avatarUrl"
-          :alt="results.public_id"
-          max-width="200"
-          max-height="200"
-        >
-        </v-img>
+          <!-- display uploaded image if successful -->
+          <v-img
+            v-if="results && results.secure_url"
+            :src="avatarUrl"
+            :alt="results.public_id"
+            max-width="200"
+            max-height="200"
+          >
+          </v-img>
+        </v-container>
         
-        <!-- display exsiting image on product edit with already image upload -->
+        <!-- display existing image on product edit with already image upload -->
         <v-container v-if="isEditImage">
           <v-row>
             <v-col cols="3">
               <v-img
+                v-if="product.avatarUrl"
                 :src="product.avatarUrl"
                 alt=""
                 max-width="100"
@@ -91,10 +101,12 @@
 
         <v-btn @click="clear">remettre à 0</v-btn>
 
-  </form>
+      </form>
 
-   <!-- display errors if not successful -->
-   <section>
+    </v-container>
+      
+    <!-- display errors if not successful -->
+    <section>
       <ul v-if="errors.length > 0">
         <li v-for="(error,index) in errors" :key="index">{{error}}</li>
       </ul>
@@ -150,10 +162,7 @@ export default {
         categories: 'getAllCategories',
         products: 'getAllProducts',
         isLoading: 'isLoading'
-      }),
-      isDisabledFileInput() {
-        return this.editAction !== 'create' && (this.avatarUrl!== '' || this.product.avatarUrl !== '')
-      }
+      })
   },
   methods: {
     submit () { 
@@ -270,31 +279,22 @@ export default {
       this.isEditImage = false;  
     },
   },
-
-  watch: {
-    product(value) {
-      if (Object.keys(value).length === 0 && value.constructor === Object) {
-        Object.keys(this.product).forEach(key => {
-          this[key] = this.product[key]
-        });
-        this.isEditImage = Object.prototype.hasOwnProperty.call(this.product, 'avatarUrl') && this.product.avatarUrl !== '';
-        this.editAction = 'edit'
-      } 
-    }
-  },
   
   mounted () {
     this.editAction = this.$route.name === 'productCreate' ? 'create' : 'edit'
     if (this.$route.name === 'productEdit' && !this.product) {
       this.isLoadingApi = true;
       Product.getOne(this.$route.params.id)
-          .then(product => {
-            this.avatarUrl = product.product.avatarUrl;
-            this.categoryId = product.product.categoryId;
-            this.description = product.product.description;
-            this.inStock = product.product.inStock;
-            this.name = product.product.name;
-            this.price = product.product.price;
+          .then((response) => {
+            if (response.product.avatarUrl) {
+              this.isEditImage = true;
+              this.avatarUrl = response.product.avatarUrl;
+            }
+            this.categoryId = response.product.categoryId;
+            this.description = response.product.description;
+            this.inStock = response.product.inStock;
+            this.name = response.product.name;
+            this.price = response.product.price;
             this.isLoadingApi = false;
           })
           .catch(err => {
@@ -303,7 +303,11 @@ export default {
           })
     }
     if (this.$route.name === 'productEdit' &&  this.product) {
-        this.avatarUrl = this.product.avatarUrl;
+        if (this.product.avatarUrl) {
+          this.isEditImage = true;
+          this.avatarUrl = this.product.avatarUrl;
+        }
+        
         this.description = this.product.description;
         this.categoryId = this.product.categoryId;
         this.inStock = this.product.inStock;
