@@ -31,9 +31,13 @@
 
       <v-spacer></v-spacer>
 
-      <Popup :popup-mode="popupMode">
+  
+      <Popup :popup-mode="popupMode" v-if="!isAuthenticated">
         <component :is="popupMode" slot="body"></component>
       </Popup>
+
+      <Avatar v-if="isAuthenticated" />
+
     </v-toolbar>
   </div>
  
@@ -44,10 +48,11 @@ import { mapActions, mapGetters } from 'vuex'
 import Popup from './Popup.vue';
 import Login from './_Popup/Login.vue';
 import Signup from './_Popup/Signup.vue';
+import Avatar from './Avatar.vue';
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: "Navbar",
-    components: { Popup, Login, Signup },
+    components: { Popup, Login, Signup, Avatar },
     data: () => ({
         routerLinks: [
             { name: "Home", path: "/", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
@@ -65,7 +70,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            popupMode: "getMode"
+            popupMode: "getMode",
+            isAuthenticated: "isAuthenticated"
         }),
        
     },
