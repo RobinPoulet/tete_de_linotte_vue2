@@ -20,6 +20,8 @@
             :counter="90"
             label="Description"
           ></v-text-field>
+
+          <upload></upload>
        
           <v-btn
             class="mr-4"
@@ -31,6 +33,8 @@
 
     </form>
     
+ 
+
   </div>
     
 </template>
@@ -38,10 +42,13 @@
 <script>
 import { mapGetters } from 'vuex'
 import Category from '../../../../services/CategoryService'
+import Upload from './Upload'
 
 export default {
     name: 'CategoryEditView',
-
+    components: {
+      Upload
+    },
     props: {
       id: {
         type: String,

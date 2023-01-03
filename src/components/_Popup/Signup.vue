@@ -59,7 +59,6 @@
         <!-- <div v-if="authStatus === 'loading'" class="loader" />  -->
 
         <v-btn
-        :disabled="!valid"
         color="success"
         class="mr-4"
         @click="signup"
