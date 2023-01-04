@@ -1,20 +1,35 @@
 <template>
     <div>
-        <div>
-            <p>Upload an image to Firebase:</p>
-            <input type="file" @change="previewImage" accept="image:*">
-        </div>
-        <div>
-            <p>Progress: {{ uploadValue.toFixed()+"%"  }}
-                <progress :value="uploadValue" max="100"></progress>
-            </p>
-        </div>
-        <div>
-            <img class="preview" :src="picture">
-            <br>
-            <v-btn @click="onUpload">Upload</v-btn>
-        </div>
+    
+        <v-container>
+            <v-row>
+                <v-col>
+                    <v-file-input
+                        v-model="image"
+                        :rules="rules"
+                        accept="image/png, image/jpeg, image/bmp"
+                        placeholder="Pick an avatar"
+                        prepend-icon="mdi-camera"
+                        label="Avatar"
+                        @change="previewImage"
+                    ></v-file-input>
+                </v-col>
+                <v-col>
+                    <v-btn @click="onUpload">Upload</v-btn>
+                </v-col>
+            </v-row>
+        </v-container>
+        
+        <v-img
+                v-if="picture"
+                :src="picture"
+                :alt="image.name"
+                max-width="200"
+                max-height="200"
+        ></v-img>
+    
     </div>
+
 </template>
 
 <script>
@@ -26,34 +41,34 @@ export default {
 
     data() {
         return {
-            imageData: null,
+            image: null,
             picture: null,
-            uploadValue: 0
+            uploadValue: 0,
+            rules: [
+                value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
+            ],
         }
     },
 
     methods: {
-        previewImage(event) {
+        previewImage() {
             this.uploadValue = 0;
-            this.picture = URL.createObjectURL(event.target.files[0]);
-            this.imageData = event.target.files[0];
-            console.log(event.target.files)
+            this.picture = URL.createObjectURL(this.image);
         },
 
         onUpload() {
 
-            console.log(this.imageData)
             const storage = getStorage();
 
             // Create the file metadata
             /** @type {any} */
             const metadata = {
-                contentType: this.imageData.type
+                contentType: this.image.type
             };
 
             // Upload file and metadata to the object 'images/mountains.jpg'
-            const storageRef = ref(storage, 'images/' + this.imageData.name);
-            const uploadTask = uploadBytesResumable(storageRef, this.imageData, metadata);
+            const storageRef = ref(storage, 'images/' + this.image.name);
+            const uploadTask = uploadBytesResumable(storageRef, this.image, metadata);
 
             // Listen for state changes, errors, and completion of the upload.
             uploadTask.on('state_changed',

@@ -65,6 +65,8 @@ export default {
         name: '',
         description: '',
         isLoadingApi: false,
+        image: null,
+        imageUrl: '',
     }),
 
     computed: {
