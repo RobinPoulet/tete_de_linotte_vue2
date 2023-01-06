@@ -4,8 +4,10 @@
         <h3> {{ editAction}} catégorie  </h3>
 
         <v-container v-if="isLoading">
-          ...
-        </v-container>
+          <v-progress-circular indeterminate color="primary">
+
+          </v-progress-circular>
+        </v-container> 
         
         <form @submit.prevent="submit" class="form-valid text-left" v-else>
     
@@ -67,7 +69,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import Category from '../../../../services/CategoryService'
-import Upload from './Upload'
+import Upload from '../../../components/Upload'
 
 export default {
     name: 'CategoryEditView',
@@ -100,7 +102,7 @@ export default {
         },
         ...mapGetters({
             categories: 'getAllCategories',
-            isLoading: 'isLoading'
+            isLoading: 'isCategoryLoading'
         }),
     },
 

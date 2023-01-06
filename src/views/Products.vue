@@ -56,7 +56,7 @@ export default {
     computed: {
       ...mapGetters({
         products: 'getAllProducts',
-        loading: 'isLoading'
+        loading: 'isProductLoading'
       })
     },
 }

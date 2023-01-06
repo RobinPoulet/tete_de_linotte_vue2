@@ -111,7 +111,7 @@ export default {
   computed: {
     ...mapGetters({
       categories: "getAllCategories",
-      loading: "isLoading",
+      loading: "isCategoryLoading",
     }),
   },
   methods: {

@@ -1,7 +1,7 @@
 <template>
   <div class="product-edit">
 
-    <v-container v-if="isLoading || isLoadingApi">
+    <v-container v-if="isLoading">
       <v-progress-circular indeterminate color="primary">
 
       </v-progress-circular>
@@ -46,53 +46,34 @@
         ></v-checkbox>
 
       
-        <v-container v-if="!isEditImage">
-          <v-file-input
-            v-model="image"
-            :rules="rules"
-            accept="image/png, image/jpeg, image/bmp"
-            placeholder="Pick an avatar"
-            prepend-icon="mdi-camera"
-            label="Avatar"
-            @change="getAvatarUrl($event)"
-          ></v-file-input>
+        <upload 
+            v-if="!avatarUrl"
+            @upload-started="uploadStarted" 
+            @upload-done="uploadDone"
+          ></upload>
 
-          <!-- display uploaded image if successful -->
-          <v-img
-            v-if="results && results.secure_url"
-            :src="avatarUrl"
-            :alt="results.public_id"
-            max-width="200"
-            max-height="200"
-          >
-          </v-img>
-        </v-container>
-        
-        <!-- display existing image on product edit with already image upload -->
-        <v-container v-if="isEditImage">
-          <v-row>
-            <v-col cols="3">
-              <v-img
-                v-if="product.avatarUrl"
-                :src="product.avatarUrl"
-                alt=""
-                max-width="100"
-                max-height="100"
-              >
-              </v-img>
-            </v-col>
-            <v-col cols="3">
-              <v-btn 
-                @click="deleteImage"
-              >
-                <v-icon color="red">
-                  mdi-delete
-                </v-icon>
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-
+          <v-container v-else class="mt-2 mb-4 text-left">
+            <div class="subheading" style="color: rgba(0, 0, 0, 0.6)">
+              Avatar
+            </div>
+                <v-img
+                  :src="avatarUrl"
+                  aspect-ratio="1"
+                  width="150"
+                  height="150"
+                ></v-img>
+                <v-btn
+                  class="ma-2"
+                  outlined
+                  color="red"
+                  @click="removeImage"
+                >
+                  <v-icon white>
+                    mdi-close-circle
+                  </v-icon>
+                  Supprimer
+                </v-btn>
+          </v-container>
         <v-btn
           class="mr-4"
           type="submit"
@@ -119,10 +100,13 @@
 <script>
 import { mapGetters } from 'vuex'
 import Product from '../../../../services/ProductService'
-import axios from 'axios'
+import Upload from '../../../components/Upload'
 
 export default {
   name: 'ProductEditView',
+  components: {
+    Upload
+  },
   props: {
     id: {
       type: String
@@ -152,19 +136,29 @@ export default {
       cloudName: "delfxt4yn",
       preset: "vuejs-preset",
       errors: [],
-      isLoadingApi: false,
+      isLoadingUploadImage: false
   }),
   computed: {
       isEnableSubmit() {
-          return this.name !== '' && this.description !== '' && this.price !== '' && this.categoryId !== ''
+          return !(this.name && this.description && this.price  && this.categoryId && this.avatarUrl)
       },
       ...mapGetters({
         categories: 'getAllCategories',
         products: 'getAllProducts',
-        isLoading: 'isLoading'
+        isLoading: 'isProductLoading'
       })
   },
   methods: {
+    uploadStarted () {
+        this.isLoadingUploadImage = true
+      },
+      uploadDone (url) {
+        this.avatarUrl = url
+        this.isLoadingUploadImage = false
+      },
+      removeImage () {
+        this.avatarUrl = ''
+      },
     submit () { 
       const product = {
         name: this.name,
@@ -206,113 +200,28 @@ export default {
       this.description = ''
       this.price = ''
       this.checkbox = 0
-    },
-    handleFileImport() {
-      this.isSelecting = true;
-
-      window.addEventListener('focus', () => {
-        this.isSelecting = false;
-      }, {once: true});
-      this.$refs.uploader.click();
-    },
-    handleFileChange(event) {
-      console.log("handlefilechange", event.target.files);
-      //returns an array of files even though multiple not used
-      this.file = event.target.files[0];
-      this.filesSelected = event.target.files.length;
-    },
-    prepareFormData() {
-      this.formData = new FormData();
-      this.formData.append("upload_preset", this.preset);
-      this.formData.append("tags", this.tags); // Optional - add tag for image admin in Cloudinary
-      this.formData.append("file", this.fileContents);
-      console.log(this.formData)
-    },
-    getAvatarUrl() {
-      //no need to look at selected files if there is no cloudname or preset
-      if (this.preset.length < 1 || this.cloudName.length < 1) {
-        this.errors.push("You must enter a cloud name and preset to upload");
-        return;
-      }
-      // clear errors
-      else {
-        this.errors = [];
-      }
-      console.log("upload", this.image.name);
-
-      let reader = new FileReader();
-      // attach listener to be called when data from file
-      reader.addEventListener(
-        "load",
-        function() {
-          this.fileContents = reader.result;
-          this.prepareFormData();
-          let cloudinaryUploadURL = `https://api.cloudinary.com/v1_1/${this.cloudName}/upload`;
-          let requestObj = {
-            url: cloudinaryUploadURL,
-            method: "POST",
-            data: this.formData,
-          };
-          //show progress bar at beginning of post
-          axios(requestObj)
-            .then(response => {
-              this.results = response.data;
-              console.log(this.results);
-              console.log("public_id", this.results.public_id);
-              this.avatarUrl = this.results.secure_url;
-            })
-            .catch(error => {
-              this.errors.push(error);
-              console.log(this.error);
-            })
-      }.bind(this),
-      false
-    );
-      // call for file read if there is a file
-      if (this.image && this.image.name) {
-        reader.readAsDataURL(this.image);
-      }
-    },
-    deleteImage() {
-      this.avatarUrl = '';
-      this.image = null;
-      this.isEditImage = false;  
+      this.avatarUrl = ''
     },
   },
-  
+
   mounted () {
     this.editAction = this.$route.name === 'productCreate' ? 'create' : 'edit'
-    if (this.$route.name === 'productEdit' && !this.product) {
-      this.isLoadingApi = true;
-      Product.getOne(this.$route.params.id)
-          .then((response) => {
-            if (response.product.avatarUrl) {
-              this.isEditImage = true;
-              this.avatarUrl = response.product.avatarUrl;
-            }
-            this.categoryId = response.product.categoryId;
-            this.description = response.product.description;
-            this.inStock = response.product.inStock;
-            this.name = response.product.name;
-            this.price = response.product.price;
-            this.isLoadingApi = false;
-          })
-          .catch(err => {
-            this.$toastr.e(`${err.name} : ${err.message}`);
-            this.$router.push('/admin/product/list');
-          })
-    }
-    if (this.$route.name === 'productEdit' &&  this.product) {
-        if (this.product.avatarUrl) {
-          this.isEditImage = true;
-          this.avatarUrl = this.product.avatarUrl;
+    if (this.editAction === 'edit' && !this.product) {
+            const productFind = this.products.find(product => product._id === this.$route.params.id)
+            this.categoryId = productFind.categoryId;
+            this.description = productFind.description;
+            this.inStock = productFind.inStock;
+            this.name = productFind.name;
+            this.price = productFind.price;
+            this.avatarUrl = productFind.avatarUrl ?? '';
         }
-        
+    if (this.$route.name === 'productEdit' &&  this.product) {
         this.description = this.product.description;
         this.categoryId = this.product.categoryId;
         this.inStock = this.product.inStock;
         this.name = this.product.name;
         this.price = this.product.price;
+        this.avatarUrl = this.product.avatarUrl ?? '';
       }
   },
 

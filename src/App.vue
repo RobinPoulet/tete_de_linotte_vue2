@@ -41,8 +41,9 @@ export default {
 		...mapGetters ({
 			popupVisible: 'isVisible',
 			popupMode: 'getMode',
-			apiStatus: 'apiStatus',
-			apiErrors: 'getApiErrors'
+			apiProductStatus: 'getProductApiStatus', 
+			apiCategoryStatus: ' getCategoryApiStatus',
+			apiErrors: ['getProductApiErrors', 'getCategoryApiErrors']
 		})
 	},
 	watch: {
