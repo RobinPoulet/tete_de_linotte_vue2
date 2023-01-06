@@ -1,32 +1,41 @@
 <template>
-    <div>
-    
-        <v-container>
-            <v-row>
-                <v-col>
-                    <v-file-input
-                        v-model="image"
-                        :rules="rules"
-                        accept="image/png, image/jpeg, image/bmp"
-                        placeholder="Pick an avatar"
-                        prepend-icon="mdi-camera"
-                        label="Avatar"
-                        @change="previewImage"
-                    ></v-file-input>
+
+    <div class="mb-4">
+           
+        <v-file-input
+            v-model="image"
+            :rules="rules"
+            accept="image/png, image/jpeg, image/bmp"
+            placeholder="Pick an avatar"
+            prepend-icon="mdi-camera"
+            label="Avatar"
+            @change="onUpload"
+        ></v-file-input>
+
+        <v-container v-if="picture">
+            <v-row no-gutters>
+                <v-col cols="3">
+                    <v-img
+                        :src="picture"
+                        :alt="image.name"
+                        max-width="150"
+                        max-height="150"
+                    ></v-img>
                 </v-col>
-                <v-col>
-                    <v-btn @click="onUpload">Upload</v-btn>
+
+                <v-col cols="2"></v-col>
+
+                <v-col cols="3">
+                    <v-progress-circular
+                        v-show="loading"
+                        :width="3"
+                        color="green"
+                        indeterminate
+                    ></v-progress-circular>
                 </v-col>
+
             </v-row>
         </v-container>
-        
-        <v-img
-                v-if="picture"
-                :src="picture"
-                :alt="image.name"
-                max-width="200"
-                max-height="200"
-        ></v-img>
     
     </div>
 
@@ -41,6 +50,7 @@ export default {
 
     data() {
         return {
+            loading: false,
             image: null,
             picture: null,
             uploadValue: 0,
@@ -53,11 +63,13 @@ export default {
     methods: {
         previewImage() {
             this.uploadValue = 0;
-            this.picture = URL.createObjectURL(this.image);
+            
         },
 
         onUpload() {
-
+            this.loading = true;
+            this.picture = URL.createObjectURL(this.image);
+            this.$emit('upload-started');
             const storage = getStorage();
 
             // Create the file metadata
@@ -79,6 +91,7 @@ export default {
                 switch (snapshot.state) {
                 case 'paused':
                     console.log('Upload is paused');
+                    this.$toastr.i(`Upload is paused`);
                     break;
                 case 'running':
                     console.log('Upload is running');
@@ -91,23 +104,29 @@ export default {
                 switch (error.code) {
                 case 'storage/unauthorized':
                     // User doesn't have permission to access the object
+                    this.$toastr.e(`${error.code} : User doesn't have permission to access the object`);
                     break;
                 case 'storage/canceled':
                     // User canceled the upload
+                    this.$toastr.e(`${error.code} : User canceled the upload`);
                     break;
 
                 // ...
 
                 case 'storage/unknown':
                     // Unknown error occurred, inspect error.serverResponse
+                    this.$toastr.e(`${error.code} : Unknown error occurred, inspect error.serverResponse`);
                     break;
                 }
             }, 
             () => {
                 // Upload completed successfully, now we can get the download URL
                 this.uploadValue = 100;
+                this.loading = false;
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    this.$emit('upload-done', downloadURL);
                     console.log('File available at', downloadURL);
+                    this.$toastr.s(`image a été upload avec succès`);
                 });
             }
             );
@@ -117,3 +136,9 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.v-progress-circular {
+  margin: 1rem;
+}
+</style>

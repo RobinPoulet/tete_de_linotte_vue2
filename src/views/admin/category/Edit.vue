@@ -21,7 +21,7 @@
             label="Description"
           ></v-text-field>
 
-          <upload></upload>
+          <upload @upload-started="uploadStarted" @upload-done="uploadDone"></upload>
        
           <v-btn
             class="mr-4"
@@ -65,13 +65,13 @@ export default {
         name: '',
         description: '',
         isLoadingApi: false,
-        image: null,
         imageUrl: '',
+        isLoadingUploadImage: false
     }),
 
     computed: {
         isEnableSubmit() {
-            return this.name !== '' && this.description !== ''
+            return this.name !== '' && this.description !== '' && !this.isLoadingUploadImage
         },
         ...mapGetters({
             categories: 'getAllCategories',
@@ -80,10 +80,18 @@ export default {
     },
 
     methods: {
+      uploadStarted () {
+        this.isLoadingUploadImage = true
+      },
+      uploadDone (url) {
+        this.imageUrl = url
+        this.isLoadingUploadImage = false
+      },
       submit () {
         const category = {
           name: this.name,
-          description: this.description
+          description: this.description,
+          imageUrl: this.imageUrl
         };
         this.editAction === 'create' ? 
           Category.add(category)
@@ -97,7 +105,7 @@ export default {
               this.$router.push('/admin/category/list');
             })
           :
-          Category.update(this.category._id, category)
+          Category.update(this.$route.params.id, category)
             .then(() => {
               this.$store.dispatch("getAllCategories")
               this.$toastr.s(`${category.name} a été modifiée avec succès`);
