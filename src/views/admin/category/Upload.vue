@@ -48,6 +48,13 @@ export default {
     // eslint-disable-next-line vue/multi-word-component-names
     name: 'Upload',
 
+    props: {
+        editAction: {
+            type: String,
+            default: ''
+        }
+    },
+
     data() {
         return {
             loading: false,

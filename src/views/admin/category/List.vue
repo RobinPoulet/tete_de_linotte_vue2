@@ -16,6 +16,7 @@
         <thead>
           <tr>
             <th class="text-left"></th>
+            <th class="text-left">Image</th>
             <th class="text-left">Nom</th>
             <th class="text-left">Description</th>
             <th class="text-left"></th>
@@ -38,20 +39,31 @@
                 <v-icon color="red"> mdi-account-eye </v-icon>
               </router-link>
             </td>
+            <td class="text-left">
+              <div v-if="category.imageUrl">
+                  <img
+                      :src="category.imageUrl"
+                      style="width: 80px; height: 80px; padding-top: 5px; padding-bottom: 5px;"
+                  />
+              </div>
+              <div v-else>
+                  <p>Pas d'image disponible</p>
+              </div>
+            </td>
             <td>{{ category.name }}</td>
             <td>{{ category.description }}</td>
-            <td>
+            <td> 
               <router-link
-                :to="{
-                  name: 'categoryEdit',
-                  params: {
-                    id: category._id,
-                    category: category,
-                  },
-                }"
-                style="text-decoration: none; color: inherit"
-              >
-                <v-icon color="blue darken-2"> mdi-pencil </v-icon>
+                    :to="{
+                      name: 'categoryEdit',
+                      params: {
+                        id: category._id,
+                        category: category,
+                      },
+                    }"
+                    style="text-decoration: none; color: inherit"
+                  >
+                    <v-icon color="blue darken-2"> mdi-pencil </v-icon>
               </router-link>
             </td>
             <td>

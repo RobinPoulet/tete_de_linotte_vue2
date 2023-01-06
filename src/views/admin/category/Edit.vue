@@ -3,11 +3,11 @@
     
         <h3> {{ editAction}} catégorie  </h3>
 
-        <v-container v-if="isLoading || isLoadingApi">
+        <v-container v-if="isLoading">
           ...
         </v-container>
         
-        <form @submit.prevent="submit" class="form-valid" v-else>
+        <form @submit.prevent="submit" class="form-valid text-left" v-else>
     
           <v-text-field
             v-model="name"
@@ -21,7 +21,34 @@
             label="Description"
           ></v-text-field>
 
-          <upload @upload-started="uploadStarted" @upload-done="uploadDone"></upload>
+          <upload 
+            v-if="!imageUrl"
+            @upload-started="uploadStarted" 
+            @upload-done="uploadDone"
+          ></upload>
+
+          <v-container v-else class="mt-2 mb-4 text-left">
+            <div class="subheading" style="color: rgba(0, 0, 0, 0.6)">
+              Avatar
+            </div>
+                <v-img
+                  :src="imageUrl"
+                  aspect-ratio="1"
+                  width="150"
+                  height="150"
+                ></v-img>
+                <v-btn
+                  class="ma-2"
+                  outlined
+                  color="red"
+                  @click="removeImage"
+                >
+                  <v-icon white>
+                    mdi-close-circle
+                  </v-icon>
+                  Supprimer
+                </v-btn>
+          </v-container>
        
           <v-btn
             class="mr-4"
@@ -32,8 +59,6 @@
           <v-btn @click="clear">remettre à 0</v-btn>
 
     </form>
-    
- 
 
   </div>
     
@@ -64,14 +89,14 @@ export default {
         editAction: '',
         name: '',
         description: '',
-        isLoadingApi: false,
         imageUrl: '',
+        image: null,
         isLoadingUploadImage: false
     }),
 
     computed: {
         isEnableSubmit() {
-            return this.name !== '' && this.description !== '' && !this.isLoadingUploadImage
+            return !(this.name && this.description && this.isLoadingUploadImage)
         },
         ...mapGetters({
             categories: 'getAllCategories',
@@ -86,6 +111,9 @@ export default {
       uploadDone (url) {
         this.imageUrl = url
         this.isLoadingUploadImage = false
+      },
+      removeImage () {
+        this.imageUrl = ''
       },
       submit () {
         const category = {
@@ -119,27 +147,29 @@ export default {
       clear () {
         this.name = ''
         this.description = ''
+        this.imageUrl = ''
       },
+    },
+
+    watch: {
+      categories(val) {
+        console.log(val)
+          if (val.length && this.editAction === 'edit' && !this.category) {
+            const categoryFind = this.categories.find(category => category._id === this.$route.params.id)
+            console.log(this.categories, categoryFind)
+            this.name = categoryFind.name
+            this.description = categoryFind.description
+            this.imageUrl = categoryFind.imageUrl ?? ''
+        }
+      }
     },
 
     mounted () {
       this.editAction = this.$route.name === 'categoryCreate' ? 'create' : 'edit'
-      if (this.$route.name === 'categoryEdit' && !this.category) {
-        this.isLoadingApi = true;
-        Category.getOne(this.$route.params.id)
-          .then(category => {
-            this.name = category.category.name
-            this.description = category.category.description
-            this.isLoadingApi = false;
-          })
-          .catch(err => {
-            this.$toastr.e(`${err.name} : ${err.message}`);
-            this.$router.push('/admin/category/list');
-          })
-      }
       if (this.$route.name === 'categoryEdit' &&  this.category) {
         this.name = this.category.name
         this.description = this.category.description
+        this.imageUrl = this.category.imageUrl ?? ''
       }
     },
 }
