@@ -92,7 +92,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import ProductApi from '../../../../services/ProductService'
-import { Product } from '../../../../services/Product'
 import Upload from '../../../components/Upload'
 
 export default {
@@ -111,7 +110,14 @@ export default {
     }
   },
   data: () => ({
-      inputProduct: new Product(),
+      inputProduct: {
+        name: '',
+        description: '',
+        price: '',
+        categoryId: '',
+        inStock: false,
+        avatarUrl: ''
+      },
       editAction: '',
       rules: [
         value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
@@ -120,7 +126,11 @@ export default {
   }),
   computed: {
       isEnableSubmit() {
-          return this.name && this.description && this.price  && this.categoryId && !this.isLoadingUploadImage
+          return this.inputProduct.name && 
+                this.inputProduct.description && 
+                this.inputProduct.price  && 
+                this.inputProduct.categoryId && 
+                !this.isLoadingUploadImage
       },
       ...mapGetters({
         categories: 'getAllCategories',
@@ -166,19 +176,34 @@ export default {
           )  
     },
     clear () {
-      this.inputProdut = new Product();
+      this.inputProdut.name = '';
+      this.inputProdut.description = '';
+      this.inputProdut.price = '';
+      this.inputProdut.categoryId = '';
+      this.inputProdut.inStock = false;
+      this.inputProdut.avatarUrl = '';
     }
   },
 
   mounted () {
     this.editAction = this.$route.name === 'productCreate' ? 'create' : 'edit'
     if (this.editAction === 'edit' && !this.product) {
-      this.inputProduct = new Product(
-        ...this.products.find(product => product._id === this.$route.params.id)
-      )
+        const productFind = this.products.find(product => product._id === this.$route.params.id);
+        this.inputProduct.name = productFind.name;
+        this.inputProduct.description = productFind.description;
+        this.inputProduct.price = productFind.price;
+        this.inputProduct.categoryId = productFind.categoryId;
+        this.inputProduct.inStock = productFind.inStock;
+        this.inputProduct.avatarUrl = productFind.avatarUrl;
     }
     if (this.$route.name === 'productEdit' && this.product) {
-       this.inputProduct = new Product(...this.product);
+        this.inputProduct.name = this.product.name;
+        this.inputProduct.description = this.product.description;
+        this.inputProduct.price = this.product.price;
+        this.inputProduct.categoryId = this.product.categoryId;
+        this.inputProduct.inStock = this.product.inStock;
+        this.inputProduct.avatarUrl = this.product.avatarUrl;
+        this.inputProduct.price = this.product.price;
       }
   },
 
