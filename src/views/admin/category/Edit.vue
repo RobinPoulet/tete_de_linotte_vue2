@@ -24,7 +24,7 @@
           ></v-text-field>
 
           <upload 
-            v-if="!imageUrl"
+            v-if="isUpload"
             @upload-started="uploadStarted" 
             @upload-done="uploadDone"
           ></upload>
@@ -92,13 +92,13 @@ export default {
         name: '',
         description: '',
         imageUrl: '',
-        image: null,
-        isLoadingUploadImage: false
+        isLoadingUploadImage: false,
+        isUpload: false
     }),
 
     computed: {
         isEnableSubmit() {
-            return !(this.name && this.description && this.isLoadingUploadImage)
+            return this.name && this.description && !this.isLoadingUploadImage
         },
         ...mapGetters({
             categories: 'getAllCategories',
@@ -116,6 +116,7 @@ export default {
       },
       removeImage () {
         this.imageUrl = ''
+        this.isUpload = true
       },
       submit () {
         const category = {
@@ -153,25 +154,21 @@ export default {
       },
     },
 
-    watch: {
-      categories(val) {
-        console.log(val)
-          if (val.length && this.editAction === 'edit' && !this.category) {
+    mounted () {
+      this.editAction = this.$route.name === 'categoryCreate' ? 'create' : 'edit'
+      if (this.editAction === 'edit' && !this.category) {
             const categoryFind = this.categories.find(category => category._id === this.$route.params.id)
             console.log(this.categories, categoryFind)
             this.name = categoryFind.name
             this.description = categoryFind.description
             this.imageUrl = categoryFind.imageUrl ?? ''
+            this.isUpload = this.imageUrl ? false : true
         }
-      }
-    },
-
-    mounted () {
-      this.editAction = this.$route.name === 'categoryCreate' ? 'create' : 'edit'
       if (this.$route.name === 'categoryEdit' &&  this.category) {
         this.name = this.category.name
         this.description = this.category.description
         this.imageUrl = this.category.imageUrl ?? ''
+        this.isUpload = this.imageUrl ? false : true
       }
     },
 }

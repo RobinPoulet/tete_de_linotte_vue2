@@ -1,7 +1,7 @@
 import Category from '../../services/CategoryService'
 
 const state = {
-    categories: JSON.parse(sessionStorage.getItem('categories')) || [],
+    categories: [],
     categoryLoading: true,
     categoryApiStat: '',
     categoryApiErrors: {},
@@ -27,7 +27,6 @@ const actions = {
         Category.getAll()
           .then(response => {
             commit('SET_CATEGORIES', response.categories);
-            sessionStorage.setItem('categories', JSON.stringify(response.categories));
             commit('SET_LOADING', false);
             commit('SET_API_STATUS', "success")
           })

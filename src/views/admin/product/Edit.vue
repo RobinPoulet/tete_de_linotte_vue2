@@ -14,13 +14,13 @@
       <form @submit.prevent="submit">
   
         <v-text-field
-          v-model="name"
+          v-model="inputProduct.name"
           :counter="30"
           label="Name"
         ></v-text-field>
 
         <v-select
-          v-model="categoryId"
+          v-model="inputProduct.categoryId"
           :items="categories"
           item-text="name"
           item-color="primary"
@@ -29,25 +29,24 @@
         ></v-select>
 
         <v-text-field
-          v-model="description"
+          v-model="inputProduct.description"
           :counter="90"
           label="Description"
         ></v-text-field>
      
         <v-text-field
-          v-model="price"
+          v-model="inputProduct.price"
           label="Price"
         ></v-text-field>
   
         <v-checkbox
-          v-model="inStock"
+          v-model="inputProduct.inStock"
           label="En stock ?"
           type="checkbox"
         ></v-checkbox>
 
-      
         <upload 
-            v-if="!avatarUrl"
+            v-if="!inputProduct.avatarUrl"
             @upload-started="uploadStarted" 
             @upload-done="uploadDone"
           ></upload>
@@ -57,7 +56,7 @@
               Avatar
             </div>
                 <v-img
-                  :src="avatarUrl"
+                  :src="inputProduct.avatarUrl"
                   aspect-ratio="1"
                   width="150"
                   height="150"
@@ -86,20 +85,14 @@
 
     </v-container>
       
-    <!-- display errors if not successful -->
-    <section>
-      <ul v-if="errors.length > 0">
-        <li v-for="(error,index) in errors" :key="index">{{error}}</li>
-      </ul>
-    </section>
-  
 </div>
   
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import Product from '../../../../services/ProductService'
+import ProductApi from '../../../../services/ProductService'
+import { Product } from '../../../../services/Product'
 import Upload from '../../../components/Upload'
 
 export default {
@@ -109,38 +102,25 @@ export default {
   },
   props: {
     id: {
-      type: String
+      type: String,
+      required: false
     },
     product: {
-      type: Object
+      type: Object,
+      required: false
     }
   },
   data: () => ({
+      inputProduct: new Product(),
       editAction: '',
-      results: null,
-      name: '',
-      description: '',
-      price: '',
-      avatarUrl: '',
-      categoryId: '',
-      inStock: 0,
-      image: null,
       rules: [
         value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
       ],
-      isSelecting: false,
-      isEditImage: false,
-      tags: "browser-upload",
-      fileContents: null,
-      formData: null,
-      cloudName: "delfxt4yn",
-      preset: "vuejs-preset",
-      errors: [],
       isLoadingUploadImage: false
   }),
   computed: {
       isEnableSubmit() {
-          return !(this.name && this.description && this.price  && this.categoryId && this.avatarUrl)
+          return this.name && this.description && this.price  && this.categoryId && !this.isLoadingUploadImage
       },
       ...mapGetters({
         categories: 'getAllCategories',
@@ -153,27 +133,18 @@ export default {
         this.isLoadingUploadImage = true
       },
       uploadDone (url) {
-        this.avatarUrl = url
+        this.inputProduct.avatarUrl = url
         this.isLoadingUploadImage = false
       },
       removeImage () {
-        this.avatarUrl = ''
+        this.inputProduct.avatarUrl = ''
       },
     submit () { 
-      const product = {
-        name: this.name,
-        categoryId: this.categoryId,
-        description: this.description,
-        price: this.price,
-        inStock: this.inStock,
-        avatarUrl: this.avatarUrl,
-      };
-
       this.editAction === 'create' ?
-        Product.add(product)
+        ProductApi.add(this.inputProduct)
           .then(() => {
             this.$store.dispatch('getAllProducts')
-            this.$toastr.s(`${product.name} a été ajoutée avec succès`)
+            this.$toastr.s(`${this.inputProduct.name} a été ajoutée avec succès`)
             this.$router.push('/admin/products/list')
           }) 
           .catch(err => {
@@ -182,10 +153,10 @@ export default {
             }
           )
         :
-        Product.update(this.product._id, product)
+        ProductApi.update(this.$route.params.id, this.inputProduct)
           .then(() => {
             this.$store.dispatch('getAllProducts')
-            this.$toastr.s(`${product.name} a été modifiée avec succès`)
+            this.$toastr.s(`${this.inputProduct.name} a été modifiée avec succès`)
             this.$router.push('/admin/products/list')
           }) 
           .catch(err => {
@@ -195,33 +166,19 @@ export default {
           )  
     },
     clear () {
-      this.name = ''
-      this.categoryId = ''
-      this.description = ''
-      this.price = ''
-      this.checkbox = 0
-      this.avatarUrl = ''
-    },
+      this.inputProdut = new Product();
+    }
   },
 
   mounted () {
     this.editAction = this.$route.name === 'productCreate' ? 'create' : 'edit'
     if (this.editAction === 'edit' && !this.product) {
-            const productFind = this.products.find(product => product._id === this.$route.params.id)
-            this.categoryId = productFind.categoryId;
-            this.description = productFind.description;
-            this.inStock = productFind.inStock;
-            this.name = productFind.name;
-            this.price = productFind.price;
-            this.avatarUrl = productFind.avatarUrl ?? '';
-        }
-    if (this.$route.name === 'productEdit' &&  this.product) {
-        this.description = this.product.description;
-        this.categoryId = this.product.categoryId;
-        this.inStock = this.product.inStock;
-        this.name = this.product.name;
-        this.price = this.product.price;
-        this.avatarUrl = this.product.avatarUrl ?? '';
+      this.inputProduct = new Product(
+        ...this.products.find(product => product._id === this.$route.params.id)
+      )
+    }
+    if (this.$route.name === 'productEdit' && this.product) {
+       this.inputProduct = new Product(...this.product);
       }
   },
 

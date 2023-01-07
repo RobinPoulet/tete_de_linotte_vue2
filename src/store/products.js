@@ -1,7 +1,7 @@
 import Product from '../../services/ProductService'
 
 const state = {
-    products: JSON.parse(sessionStorage.getItem('products')) || [],
+    products: [],
     productLoading: true,
     productApiStat: '',
     productApiErrors: {},
@@ -27,7 +27,6 @@ const actions = {
         Product.getAll()
           .then(response => {
             commit('SET_PRODUCTS', response.products);
-            sessionStorage.setItem('products', JSON.stringify(response.products));
             commit('SET_LOADING', false);
             commit('SET_API_STATUS', "success");
           })
