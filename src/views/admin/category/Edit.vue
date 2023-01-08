@@ -1,66 +1,68 @@
 <template>
+
     <div class="category-edit">
-    
-        <h3> {{ editAction}} catégorie  </h3>
 
         <v-container v-if="isLoading">
           <v-progress-circular indeterminate color="primary">
-
           </v-progress-circular>
         </v-container> 
+
+        <v-container v-else>
         
-        <form @submit.prevent="submit" class="form-valid text-left" v-else>
-    
-          <v-text-field
-            v-model="name"
-            :counter="30"
-            label="Name"
-          ></v-text-field>
+          <form @submit.prevent="submit" class="form-valid text-left">
+      
+            <v-text-field
+              v-model="categoryInput.name"
+              :counter="30"
+              label="Name"
+            ></v-text-field>
 
-          <v-text-field
-            v-model="description"
-            :counter="90"
-            label="Description"
-          ></v-text-field>
+            <v-text-field
+              v-model="categoryInput.description"
+              :counter="90"
+              label="Description"
+            ></v-text-field>
 
-          <upload 
-            v-if="isUpload"
-            @upload-started="uploadStarted" 
-            @upload-done="uploadDone"
-          ></upload>
+            <upload 
+              v-if="isUpload"
+              @upload-started="uploadStarted" 
+              @upload-done="uploadDone"
+              @clear-upload="clearUpload"
+            ></upload>
 
-          <v-container v-else class="mt-2 mb-4 text-left">
-            <div class="subheading" style="color: rgba(0, 0, 0, 0.6)">
-              Avatar
-            </div>
-                <v-img
-                  :src="imageUrl"
-                  aspect-ratio="1"
-                  width="150"
-                  height="150"
-                ></v-img>
-                <v-btn
-                  class="ma-2"
-                  outlined
-                  color="red"
-                  @click="removeImage"
-                >
-                  <v-icon white>
-                    mdi-close-circle
-                  </v-icon>
-                  Supprimer
-                </v-btn>
-          </v-container>
-       
-          <v-btn
-            class="mr-4"
-            type="submit"
-            :disabled="!isEnableSubmit"
-          >envoyer</v-btn>
+            <v-container v-else class="mt-2 mb-4 text-left">
+              <div class="subheading" style="color: rgba(0, 0, 0, 0.6)">
+                Avatar
+              </div>
+                  <v-img
+                    :src="categoryInput.imageUrl"
+                    max-width="150"
+                    max-height="150"
+                  ></v-img>
+                  <v-btn
+                    class="ma-2"
+                    outlined
+                    color="red"
+                    @click="removeImage"
+                  >
+                    <v-icon white>
+                      mdi-close-circle
+                    </v-icon>
+                    Supprimer
+                  </v-btn>
+            </v-container>
+        
+            <v-btn
+              class="mr-4"
+              type="submit"
+              :disabled="!isEnableSubmit"
+            >envoyer</v-btn>
 
-          <v-btn @click="clear">remettre à 0</v-btn>
+            <v-btn @click="clear">remettre à 0</v-btn>
 
-    </form>
+          </form>
+
+  </v-container>
 
   </div>
     
@@ -88,17 +90,19 @@ export default {
     },
 
     data: () => ({
-        editAction: '',
-        name: '',
-        description: '',
-        imageUrl: '',
+        isCategoryCreate: false,
+        categoryInput : {
+          name: '',
+          description: '',
+          imageUrl: ''
+        },
         isLoadingUploadImage: false,
         isUpload: false
     }),
 
     computed: {
         isEnableSubmit() {
-            return this.name && this.description && !this.isLoadingUploadImage
+            return this.categoryInput.name && this.categoryInput.description && !this.isLoadingUploadImage
         },
         ...mapGetters({
             categories: 'getAllCategories',
@@ -111,24 +115,22 @@ export default {
         this.isLoadingUploadImage = true
       },
       uploadDone (url) {
-        this.imageUrl = url
+        this.categoryInput.imageUrl = url
         this.isLoadingUploadImage = false
       },
       removeImage () {
-        this.imageUrl = ''
+        this.categoryInput.imageUrl = ''
         this.isUpload = true
       },
+      clearUpload() {
+        this.removeImage()
+      },
       submit () {
-        const category = {
-          name: this.name,
-          description: this.description,
-          imageUrl: this.imageUrl
-        };
-        this.editAction === 'create' ? 
-          Category.add(category)
+        this.isCategoryCreate ? 
+          Category.add(this.categoryInput)
             .then(() => {
               this.$store.dispatch("getAllCategories")
-              this.$toastr.s(`${category.name} a été ajoutée avec succès`);
+              this.$toastr.s(`${this.categoryInput.name} a été ajoutée avec succès`);
               this.$router.push('/admin/category/list');
             })
             .catch(err => {
@@ -136,10 +138,10 @@ export default {
               this.$router.push('/admin/category/list');
             })
           :
-          Category.update(this.$route.params.id, category)
+          Category.update(this.$route.params.id, this.categoryInput)
             .then(() => {
               this.$store.dispatch("getAllCategories")
-              this.$toastr.s(`${category.name} a été modifiée avec succès`);
+              this.$toastr.s(`${this.categoryInput.name} a été modifiée avec succès`);
               this.$router.push('/admin/category/list');
             })
             .catch(err => {
@@ -148,27 +150,26 @@ export default {
             })
       },
       clear () {
-        this.name = ''
-        this.description = ''
-        this.imageUrl = ''
+        this.categoryInput.name = ''
+        this.categoryInput.description = ''
+        this.categoryInput.imageUrl = ''
       },
     },
 
     mounted () {
-      this.editAction = this.$route.name === 'categoryCreate' ? 'create' : 'edit'
+      this.isCategoryCreate = this.$route.name === 'categoryCreate'
       if (this.editAction === 'edit' && !this.category) {
             const categoryFind = this.categories.find(category => category._id === this.$route.params.id)
-            console.log(this.categories, categoryFind)
-            this.name = categoryFind.name
-            this.description = categoryFind.description
-            this.imageUrl = categoryFind.imageUrl ?? ''
-            this.isUpload = this.imageUrl ? false : true
+            this.categoryInput.name = categoryFind.name
+            this.categoryInput.description = categoryFind.description
+            this.categoryInput.imageUrl = categoryFind.imageUrl ?? ''
+            this.isUpload = this.categoryInput.imageUrl ? false : true
         }
       if (this.$route.name === 'categoryEdit' &&  this.category) {
-        this.name = this.category.name
-        this.description = this.category.description
-        this.imageUrl = this.category.imageUrl ?? ''
-        this.isUpload = this.imageUrl ? false : true
+        this.categoryInput.name = this.category.name
+        this.categoryInput.description = this.category.description
+        this.categoryInput.imageUrl = this.category.imageUrl ?? ''
+        this.isUpload = this.categoryInput.imageUrl ? false : true
       }
     },
 }
@@ -176,13 +177,6 @@ export default {
 </script>
 
 <style>
-
-  .category-edit {
-      margin-top: 8%;
-      margin-left: 4%;
-      margin-bottom: 8%;
-  }
-  
   .form-valid {
       width: 50%;
   }

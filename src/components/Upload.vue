@@ -10,6 +10,7 @@
             prepend-icon="mdi-camera"
             label="Avatar"
             @change="onUpload"
+            @click:clear="clearUpload"
         ></v-file-input>
 
         <v-container v-if="picture">
@@ -68,9 +69,9 @@ export default {
     },
 
     methods: {
-        previewImage() {
-            this.uploadValue = 0;
-            
+        clearUpload() {
+            this.picture = null;
+            this.$emit('clear');
         },
 
         onUpload() {

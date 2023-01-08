@@ -10,7 +10,7 @@
                         <p>Bienvenue sur votre interface administrateur</p>
                     </v-container>
                     <v-container v-else>
-                        <h2 style="text-align:center;">{{ viewName }}</h2>
+                        <h2 class="text-left ml-4">{{ viewName }}</h2>
                         <router-view></router-view>
                     </v-container>   
                 </v-col>
@@ -34,10 +34,15 @@ export default {
     }),
     computed: {
         viewName() {
-            return this.$route.name
+            return this.camelCaseToRegular(this.$route.name)
         },
         isRootAdminView() {
             return this.$route.name === 'admin'
+        }
+    },
+    methods: {
+        camelCaseToRegular(str) {
+            return str.replace(/([a-z])([A-Z])/g, '$1 $2');
         }
     }
 }

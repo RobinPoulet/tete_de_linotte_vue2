@@ -3,15 +3,12 @@
 
     <v-container v-if="isLoading">
       <v-progress-circular indeterminate color="primary">
-
       </v-progress-circular>
     </v-container> 
   
     <v-container v-else>
-
-      <h3> {{ editAction}} product</h3>
       
-      <form @submit.prevent="submit">
+      <form @submit.prevent="submit" class="form-valid text-left">
   
         <v-text-field
           v-model="inputProduct.name"
@@ -46,9 +43,10 @@
         ></v-checkbox>
 
         <upload 
-            v-if="!inputProduct.avatarUrl"
+            v-if="isUpload"
             @upload-started="uploadStarted" 
             @upload-done="uploadDone"
+            @clear-upload="clearUpload"
           ></upload>
 
           <v-container v-else class="mt-2 mb-4 text-left">
@@ -57,9 +55,8 @@
             </div>
                 <v-img
                   :src="inputProduct.avatarUrl"
-                  aspect-ratio="1"
-                  width="150"
-                  height="150"
+                  max-width="150"
+                  max-height="150"
                 ></v-img>
                 <v-btn
                   class="ma-2"
@@ -116,13 +113,14 @@ export default {
         price: '',
         categoryId: '',
         inStock: false,
-        avatarUrl: ''
+        avatarUrl: '',
       },
       editAction: '',
       rules: [
         value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
       ],
-      isLoadingUploadImage: false
+      isLoadingUploadImage: false,
+      isUpload: false
   }),
   computed: {
       isEnableSubmit() {
@@ -148,6 +146,10 @@ export default {
       },
       removeImage () {
         this.inputProduct.avatarUrl = ''
+        this.isUpload = true
+      },
+      clearUpload() {
+        this.removeImage()
       },
     submit () { 
       this.editAction === 'create' ?
@@ -195,6 +197,7 @@ export default {
         this.inputProduct.categoryId = productFind.categoryId;
         this.inputProduct.inStock = productFind.inStock;
         this.inputProduct.avatarUrl = productFind.avatarUrl;
+        this.isUpload = this.inputProduct.avatarUrl ? false : true
     }
     if (this.$route.name === 'productEdit' && this.product) {
         this.inputProduct.name = this.product.name;
@@ -204,6 +207,7 @@ export default {
         this.inputProduct.inStock = this.product.inStock;
         this.inputProduct.avatarUrl = this.product.avatarUrl;
         this.inputProduct.price = this.product.price;
+        this.isUpload = this.inputProduct.avatarUrl ? false : true
       }
   },
 
@@ -211,12 +215,6 @@ export default {
 </script>
 
 <style>
-.product-edit {
-    margin-top: 8%;
-    margin-left: 4%;
-    margin-bottom: 4%;
-}
-
 .form-valid {
     width: 50%;
 }
