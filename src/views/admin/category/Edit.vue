@@ -158,14 +158,14 @@ export default {
 
     mounted () {
       this.isCategoryCreate = this.$route.name === 'categoryCreate'
-      if (this.editAction === 'edit' && !this.category) {
+      if (!this.isCategoryCreate && !this.category) {
             const categoryFind = this.categories.find(category => category._id === this.$route.params.id)
             this.categoryInput.name = categoryFind.name
             this.categoryInput.description = categoryFind.description
             this.categoryInput.imageUrl = categoryFind.imageUrl ?? ''
             this.isUpload = this.categoryInput.imageUrl ? false : true
         }
-      if (this.$route.name === 'categoryEdit' &&  this.category) {
+      if (!this.isCategoryCreate && this.category) {
         this.categoryInput.name = this.category.name
         this.categoryInput.description = this.category.description
         this.categoryInput.imageUrl = this.category.imageUrl ?? ''

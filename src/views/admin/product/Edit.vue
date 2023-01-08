@@ -115,7 +115,7 @@ export default {
         inStock: false,
         avatarUrl: '',
       },
-      editAction: '',
+      isProductCreate: false,
       rules: [
         value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
       ],
@@ -152,7 +152,7 @@ export default {
         this.removeImage()
       },
     submit () { 
-      this.editAction === 'create' ?
+      this.isProductCreate ?
         ProductApi.add(this.inputProduct)
           .then(() => {
             this.$store.dispatch('getAllProducts')
@@ -188,8 +188,8 @@ export default {
   },
 
   mounted () {
-    this.editAction = this.$route.name === 'productCreate' ? 'create' : 'edit'
-    if (this.editAction === 'edit' && !this.product) {
+    this.isProductCreate = this.$route.name === 'productCreate';
+    if (!this.isProductCreate && !this.product) {
         const productFind = this.products.find(product => product._id === this.$route.params.id);
         this.inputProduct.name = productFind.name;
         this.inputProduct.description = productFind.description;
@@ -199,7 +199,7 @@ export default {
         this.inputProduct.avatarUrl = productFind.avatarUrl;
         this.isUpload = this.inputProduct.avatarUrl ? false : true
     }
-    if (this.$route.name === 'productEdit' && this.product) {
+    if (!this.isProductCreate && this.product) {
         this.inputProduct.name = this.product.name;
         this.inputProduct.description = this.product.description;
         this.inputProduct.price = this.product.price;
