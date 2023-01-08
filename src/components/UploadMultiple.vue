@@ -3,21 +3,21 @@
     <div class="mb-4">
            
         <v-file-input
-            v-model="image"
-            :rules="rules"
+            v-model="images"
             accept="image/png, image/jpeg, image/bmp"
-            placeholder="Pick an avatar"
+            placeholder="Choisissez plusieurs images pour la galerie (maintenir la touche Ctrl enfoncée pour sélectionner plusieurs images)"
             prepend-icon="mdi-camera"
-            label="Avatar"
+            label="Select Images"
+            multiple
             @change="onUpload"
             @click:clear="clearUpload"
         ></v-file-input>
 
-        <v-container v-if="picture">
-            <v-row no-gutters>
+        <v-container v-if="images.length">
+            <v-row no-gutters v-for="(image, index) in images" :key="index">
                 <v-col cols="3">
                     <v-img
-                        :src="picture"
+                        :src="pictures[index]"
                         :alt="image.name"
                         max-width="150"
                         max-height="150"
@@ -52,12 +52,9 @@ export default {
     data() {
         return {
             loading: false,
-            image: null,
-            picture: null,
-            uploadValue: 0,
-            rules: [
-                value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
-            ],
+            images: [],
+            pictures: [],
+            urls: []
         }
     },
 
@@ -67,29 +64,24 @@ export default {
             this.$emit('clear');
         },
 
-        onUpload() {
-            this.loading = true;
-            console.log(this.image)
-            this.picture = URL.createObjectURL(this.image);
-            this.$emit('upload-started');
+        uploadOneFile(file) {
             const storage = getStorage();
 
             // Create the file metadata
             /** @type {any} */
             const metadata = {
-                contentType: this.image.type
+                contentType: file.type
             };
 
             // Upload file and metadata to the object 'images/mountains.jpg'
-            const storageRef = ref(storage, 'images/' + this.image.name);
-            const uploadTask = uploadBytesResumable(storageRef, this.image, metadata);
+            const storageRef = ref(storage, 'images/' + file.name);
+            const uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
             // Listen for state changes, errors, and completion of the upload.
             uploadTask.on('state_changed',
             (snapshot) => {
                 // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                this.uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + this.uploadValue + '% done');
+              
                 switch (snapshot.state) {
                 case 'paused':
                     console.log('Upload is paused');
@@ -123,16 +115,24 @@ export default {
             }, 
             () => {
                 // Upload completed successfully, now we can get the download URL
-                this.uploadValue = 100;
-                this.loading = false;
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    this.$emit('upload-done', downloadURL);
+                    this.urls.push(downloadURL)
+                    this.$emit('add-image-url-to-gallerie', downloadURL);
                     console.log('File available at', downloadURL);
                     this.$toastr.s(`image a été upload avec succès`);
                 });
             }
             );
+        },
 
+        onUpload() {
+            this.loading = true;
+            this.images.forEach(image => {
+                    this.pictures.push(URL.createObjectURL(image));
+                    this.uploadOneFile(image);
+                }
+            );
+            
         }
     },
 }

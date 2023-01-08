@@ -70,6 +70,11 @@
                   Supprimer
                 </v-btn>
           </v-container>
+
+       <upload-multiple
+          @add-image-url-to-gallerie="addImageUrlToGallerie"
+       ></upload-multiple>
+
         <v-btn
           class="mr-4"
           type="submit"
@@ -90,11 +95,13 @@
 import { mapGetters } from 'vuex'
 import ProductApi from '../../../../services/ProductService'
 import Upload from '../../../components/Upload'
+import UploadMultiple from '../../../components/UploadMultiple'
 
 export default {
   name: 'ProductEditView',
   components: {
-    Upload
+    Upload,
+    UploadMultiple
   },
   props: {
     id: {
@@ -114,6 +121,7 @@ export default {
         categoryId: '',
         inStock: false,
         avatarUrl: '',
+        imagesUrls: []
       },
       isProductCreate: false,
       rules: [
@@ -150,6 +158,9 @@ export default {
       },
       clearUpload() {
         this.removeImage()
+      },
+      addImageUrlToGallerie (url) {
+        this.inputProduct.imagesUrls.push(url)
       },
     submit () { 
       this.isProductCreate ?
