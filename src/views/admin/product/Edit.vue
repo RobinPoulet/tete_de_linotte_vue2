@@ -75,6 +75,31 @@
           @add-image-url-to-gallerie="addImageUrlToGallerie"
        ></upload-multiple>
 
+       <v-container class="mt-2 mb-4 text-left" v-if="inputProduct.imagesUrls.length">
+        <div class="subheading mb-3" style="color: rgba(0, 0, 0, 0.6)">
+              Images déjà uploadé
+            </div>
+        <div  v-for="(imageUrl, index) in inputProduct.imagesUrls" :key="index">
+            
+                <v-img
+                  :src="imageUrl"
+                  max-width="150"
+                  max-height="150"
+                ></v-img>
+                <v-btn
+                  class="ma-2"
+                  outlined
+                  color="red"
+                  @click="removeImageGallerie(index)"
+                >
+                  <v-icon white>
+                    mdi-close-circle
+                  </v-icon>
+                  Supprimer
+                </v-btn>
+            </div>
+          </v-container>
+
         <v-btn
           class="mr-4"
           type="submit"
@@ -156,6 +181,9 @@ export default {
         this.inputProduct.avatarUrl = ''
         this.isUpload = true
       },
+      removeImageGallerie(index) {
+        this.inputProduct.imagesUrls.splice(index, 1)
+      },
       clearUpload() {
         this.removeImage()
       },
@@ -195,6 +223,7 @@ export default {
       this.inputProdut.categoryId = '';
       this.inputProdut.inStock = false;
       this.inputProdut.avatarUrl = '';
+      this.inputproduct.imagesUrls = [];
     }
   },
 
@@ -208,6 +237,9 @@ export default {
         this.inputProduct.categoryId = productFind.categoryId;
         this.inputProduct.inStock = productFind.inStock;
         this.inputProduct.avatarUrl = productFind.avatarUrl;
+        if (productFind.imagesUrls.length) {
+          productFind.imagesUrls.forEach(imageUrl => this.inputProduct.imagesUrls.push(imageUrl))
+        }
         this.isUpload = this.inputProduct.avatarUrl ? false : true
     }
     if (!this.isProductCreate && this.product) {
@@ -218,6 +250,9 @@ export default {
         this.inputProduct.inStock = this.product.inStock;
         this.inputProduct.avatarUrl = this.product.avatarUrl;
         this.inputProduct.price = this.product.price;
+        if (this.product.imagesUrls.length) {
+          this.product.imagesUrls.forEach(imageUrl => this.inputProduct.imagesUrls.push(imageUrl))
+        }
         this.isUpload = this.inputProduct.avatarUrl ? false : true
       }
   },
