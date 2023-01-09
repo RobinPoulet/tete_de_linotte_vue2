@@ -5,17 +5,16 @@
         <v-file-input
             v-model="images"
             accept="image/png, image/jpeg, image/bmp"
-            placeholder="Choisissez plusieurs images pour la galerie (maintenir la touche Ctrl enfoncée pour sélectionner plusieurs images)"
-            prepend-icon="mdi-camera"
-            label="Select Images"
+            placeholder="Upload your images"
+            prepend-icon="mdi-paperclip"
             multiple
             @change="onUpload"
             @click:clear="clearUpload"
         ></v-file-input>
 
         <v-container v-if="images.length">
-            <v-row no-gutters v-for="(image, index) in images" :key="index">
-                <v-col cols="3">
+            <v-row no-gutters>
+                <v-col v-for="(image, index) in images" :key="index">
                     <v-img
                         :src="pictures[index]"
                         :alt="image.name"
@@ -23,18 +22,6 @@
                         max-height="150"
                     ></v-img>
                 </v-col>
-
-                <v-col cols="2"></v-col>
-
-                <v-col cols="3">
-                    <v-progress-circular
-                        v-show="loading"
-                        :width="3"
-                        color="green"
-                        indeterminate
-                    ></v-progress-circular>
-                </v-col>
-
             </v-row>
         </v-container>
     
@@ -51,7 +38,6 @@ export default {
 
     data() {
         return {
-            loading: false,
             images: [],
             pictures: [],
             urls: []
@@ -60,13 +46,15 @@ export default {
 
     methods: {
         clearUpload() {
-            this.picture = null;
+            this.pictures = [];
+            this.urls = [];
             this.$emit('clear');
         },
 
         uploadOneFile(file) {
             const storage = getStorage();
-
+            file.loading = true;
+            console.log(file)
             // Create the file metadata
             /** @type {any} */
             const metadata = {
@@ -116,6 +104,8 @@ export default {
             () => {
                 // Upload completed successfully, now we can get the download URL
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    file.loading = false;
+                    console.log(file)
                     this.urls.push(downloadURL)
                     this.$emit('add-image-url-to-gallerie', downloadURL);
                     console.log('File available at', downloadURL);
