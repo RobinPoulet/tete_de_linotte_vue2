@@ -52,6 +52,7 @@ export default {
         },
 
         uploadOneFile(file) {
+            this.$emit('upload-multiple-started');
             const storage = getStorage();
             file.loading = true;
             console.log(file)
@@ -107,7 +108,7 @@ export default {
                     file.loading = false;
                     console.log(file)
                     this.urls.push(downloadURL)
-                    this.$emit('add-image-url-to-gallerie', downloadURL);
+                    this.$emit('add-image-to-gallerie', downloadURL, file.name);
                     console.log('File available at', downloadURL);
                     this.$toastr.s(`image a été upload avec succès`);
                 });

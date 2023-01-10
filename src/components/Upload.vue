@@ -126,7 +126,7 @@ export default {
                 this.uploadValue = 100;
                 this.loading = false;
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    this.$emit('upload-done', downloadURL);
+                    this.$emit('upload-done', downloadURL, this.image.name);
                     console.log('File available at', downloadURL);
                     this.$toastr.s(`image a été upload avec succès`);
                 });

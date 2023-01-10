@@ -72,17 +72,18 @@
           </v-container>
 
        <upload-multiple
-          @add-image-url-to-gallerie="addImageUrlToGallerie"
+          @add-image-to-gallerie="addImageToGallerie"
+          @upload-multiple-started="uploadMultipleStarted"
        ></upload-multiple>
 
-       <v-container class="mt-2 mb-4 text-left" v-if="inputProduct.imagesUrls.length">
+       <v-container class="mt-2 mb-4 text-left" v-if="inputProduct.images.length">
         <div class="subheading mb-3" style="color: rgba(0, 0, 0, 0.6)">
               Images déjà uploadé
             </div>
-        <div  v-for="(imageUrl, index) in inputProduct.imagesUrls" :key="index">
+        <div  v-for="(image, index) in inputProduct.images" :key="index">
             
                 <v-img
-                  :src="imageUrl"
+                  :src="image.url"
                   max-width="150"
                   max-height="150"
                 ></v-img>
@@ -90,7 +91,7 @@
                   class="ma-2"
                   outlined
                   color="red"
-                  @click="removeImageGallerie(index)"
+                  @click="removeImageGallerie(index, image)"
                 >
                   <v-icon white>
                     mdi-close-circle
@@ -121,6 +122,7 @@ import { mapGetters } from 'vuex'
 import ProductApi from '../../../../services/ProductService'
 import Upload from '../../../components/Upload'
 import UploadMultiple from '../../../components/UploadMultiple'
+import { getStorage, ref, deleteObject } from "firebase/storage"
 
 export default {
   name: 'ProductEditView',
@@ -146,7 +148,8 @@ export default {
         categoryId: '',
         inStock: false,
         avatarUrl: '',
-        imagesUrls: []
+        avatarName: '',
+        images: []
       },
       isProductCreate: false,
       rules: [
@@ -170,25 +173,52 @@ export default {
       })
   },
   methods: {
-    uploadStarted () {
+      uploadStarted () {
         this.isLoadingUploadImage = true
       },
-      uploadDone (url) {
+      uploadMultipleStarted () {
+        this.isLoadingUploadImage = true
+      },
+      uploadDone (url, name) {
         this.inputProduct.avatarUrl = url
+        this.inputProduct.avatarName = name
         this.isLoadingUploadImage = false
+      },
+      deleteImageFromFirebase(imageName) {
+        const storage = getStorage();
+        // Create a reference to the file to delete
+        const desertRef = ref(storage, '/images/' + imageName);
+
+        // Delete the file
+        deleteObject(desertRef).then(() => {
+          // File deleted successfully
+          console.log("fichier supprimé")
+          
+        }).catch((error) => {
+          // Uh-oh, an error occurred!
+          console.log(error);
+        });
       },
       removeImage () {
         this.inputProduct.avatarUrl = ''
+        this.inputProduct.avatarName = ''
         this.isUpload = true
+        this.deleteImageFromFirebase(this.inputProduct.avatarName)
       },
-      removeImageGallerie(index) {
-        this.inputProduct.imagesUrls.splice(index, 1)
+      removeImageGallerie(index, image) {
+        this.inputProduct.images.splice(index, 1)
+        this.deleteImageFromFirebase(image.name)
       },
       clearUpload() {
         this.removeImage()
       },
-      addImageUrlToGallerie (url) {
-        this.inputProduct.imagesUrls.push(url)
+      addImageToGallerie (imageUrl, imageName) {
+        const image = {
+          url : imageUrl,
+          name: imageName
+        }
+        this.inputProduct.images.push(image)
+        this.isLoadingUploadImage = false
       },
     submit () { 
       this.isProductCreate ?
@@ -223,7 +253,7 @@ export default {
       this.inputProdut.categoryId = '';
       this.inputProdut.inStock = false;
       this.inputProdut.avatarUrl = '';
-      this.inputproduct.imagesUrls = [];
+      this.inputproduct.images = [];
     }
   },
 
@@ -237,8 +267,8 @@ export default {
         this.inputProduct.categoryId = productFind.categoryId;
         this.inputProduct.inStock = productFind.inStock;
         this.inputProduct.avatarUrl = productFind.avatarUrl;
-        if (productFind.imagesUrls.length) {
-          productFind.imagesUrls.forEach(imageUrl => this.inputProduct.imagesUrls.push(imageUrl))
+        if (productFind.images.length) {
+          productFind.images.forEach(image => this.inputProduct.images.push(image))
         }
         this.isUpload = this.inputProduct.avatarUrl ? false : true
     }
@@ -250,8 +280,8 @@ export default {
         this.inputProduct.inStock = this.product.inStock;
         this.inputProduct.avatarUrl = this.product.avatarUrl;
         this.inputProduct.price = this.product.price;
-        if (this.product.imagesUrls.length) {
-          this.product.imagesUrls.forEach(imageUrl => this.inputProduct.imagesUrls.push(imageUrl))
+        if (this.product.images.length) {
+          this.product.images.forEach(image => this.inputProduct.images.push(image))
         }
         this.isUpload = this.inputProduct.avatarUrl ? false : true
       }
