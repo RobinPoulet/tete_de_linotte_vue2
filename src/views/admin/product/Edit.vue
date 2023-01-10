@@ -74,6 +74,7 @@
        <upload-multiple
           @add-image-to-gallerie="addImageToGallerie"
           @upload-multiple-started="uploadMultipleStarted"
+          @clear-multiple="clearUploadMultiple"
        ></upload-multiple>
 
        <v-container class="mt-2 mb-4 text-left" v-if="showUploadMultiple">
@@ -156,7 +157,7 @@ export default {
         value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
       ],
       isLoadingUploadImage: false,
-      showUpload: false,
+      showUpload: true,
       showUploadMultiple: true
   }),
   computed: {
@@ -213,6 +214,10 @@ export default {
       clearUpload() {
         this.removeImage()
       },
+      clearUploadMultiple(imagesName) {
+        imagesName.forEach(imageName => this.deleteImageFromFirebase(imageName));
+        this.inputProduct.images = this.inputProduct.images.filter(image => !imagesName.includes(image.name))
+      },
       addImageToGallerie (imageUrl, imageName) {
         const image = {
           url : imageUrl,
@@ -248,13 +253,15 @@ export default {
           )  
     },
     clear () {
-      this.inputProdut.name = '';
-      this.inputProdut.description = '';
-      this.inputProdut.price = '';
-      this.inputProdut.categoryId = '';
-      this.inputProdut.inStock = false;
-      this.inputProdut.avatarUrl = '';
-      this.inputproduct.images = [];
+      this.inputProduct.name = '';
+      this.inputProduct.description = '';
+      this.inputProduct.price = '';
+      this.inputProduct.categoryId = '';
+      this.inputProduct.inStock = false;
+      this.inputProduct.avatarUrl = '';
+      this.inputProduct.avatarName = '';
+      this.inputProduct.images = [];
+      this.showUpload = true;
     }
   },
 
@@ -270,13 +277,13 @@ export default {
     this.isProductCreate = this.$route.name === 'productCreate';
     if (!this.isProductCreate && !this.product) {
         const productFind = this.products.find(product => product._id === this.$route.params.id);
-        this.inputProduct.name = productFind.name;
-        this.inputProduct.description = productFind.description;
-        this.inputProduct.price = productFind.price;
-        this.inputProduct.categoryId = productFind.categoryId;
-        this.inputProduct.inStock = productFind.inStock;
-        this.inputProduct.avatarUrl = productFind.avatarUrl;
-        this.inputProduct.avatarName = productFind.avatarName;
+        this.inputProduct.name = productFind.name
+        this.inputProduct.description = productFind.description
+        this.inputProduct.price = productFind.price
+        this.inputProduct.categoryId = productFind.categoryId
+        this.inputProduct.inStock = productFind.inStock
+        this.inputProduct.avatarUrl = productFind.avatarUrl
+        this.inputProduct.avatarName = productFind.avatarName
         if (productFind.images.length) {
           productFind.images.forEach(image => this.inputProduct.images.push(image))
         }
@@ -284,14 +291,13 @@ export default {
         this.showUploadMultiple = productFind.images.length > 0
     }
     if (!this.isProductCreate && this.product) {
-        this.inputProduct.name = this.product.name;
-        this.inputProduct.description = this.product.description;
-        this.inputProduct.price = this.product.price;
-        this.inputProduct.categoryId = this.product.categoryId;
-        this.inputProduct.inStock = this.product.inStock;
-        this.inputProduct.avatarUrl = this.product.avatarUrl;
-        this.inputProduct.avatarName = this.product.avatarName;
-        this.inputProduct.price = this.product.price;
+      this.inputProduct.name = this.product.name
+        this.inputProduct.description = this.product.description
+        this.inputProduct.price = this.product.price
+        this.inputProduct.categoryId = this.product.categoryId
+        this.inputProduct.inStock = this.product.inStock
+        this.inputProduct.avatarUrl = this.product.avatarUrl
+        this.inputProduct.avatarName = this.product.avatarName
         if (this.product.images.length) {
           this.product.images.forEach(image => this.inputProduct.images.push(image))
         }

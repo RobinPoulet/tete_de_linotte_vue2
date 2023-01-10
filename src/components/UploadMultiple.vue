@@ -9,7 +9,7 @@
             prepend-icon="mdi-paperclip"
             multiple
             @change="onUpload"
-            @click:clear="clearUpload"
+            @click:clear="clearUploadMultiple"
         ></v-file-input>
 
         <v-container v-if="images.length">
@@ -41,22 +41,21 @@ export default {
         return {
             images: [],
             pictures: [],
-            urls: []
+            imagesName: [],
         }
     },
 
     methods: {
-        clearUpload() {
-            this.pictures = [];
-            this.urls = [];
-            this.$emit('clear');
+        clearUploadMultiple() {
+            this.$emit('clear-multiple', this.imagesName);
+            this.imagesName = [];
         },
 
         uploadOneFile(file) {
+            this.pictures.push(URL.createObjectURL(file));
             this.$emit('upload-multiple-started');
             const storage = getStorage();
             file.loading = true;
-            console.log(file)
             // Create the file metadata
             /** @type {any} */
             const metadata = {
@@ -64,6 +63,7 @@ export default {
             };
             const dateTime = moment().format('YYYYMMDDHHmmss');
             const fileName = `${dateTime}_${file.name}`;
+
             // Upload file and metadata to the object 'images/mountains.jpg'
             const storageRef = ref(storage, `images/${fileName}`);
             const uploadTask = uploadBytesResumable(storageRef, file, metadata);
@@ -108,8 +108,8 @@ export default {
                 // Upload completed successfully, now we can get the download URL
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                     file.loading = false;
-                    console.log(file)
-                    this.urls.push(downloadURL)
+                    this.imagesName.push(fileName);
+                    
                     this.$emit('add-image-to-gallerie', downloadURL, fileName);
                     console.log('File available at', downloadURL);
                     this.$toastr.s(`image a été upload avec succès`);
@@ -121,7 +121,6 @@ export default {
         onUpload() {
             this.loading = true;
             this.images.forEach(image => {
-                    this.pictures.push(URL.createObjectURL(image));
                     this.uploadOneFile(image);
                 }
             );
