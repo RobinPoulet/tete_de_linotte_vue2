@@ -43,7 +43,7 @@
         ></v-checkbox>
 
         <upload 
-            v-if="isUpload"
+            v-if="showUpload"
             @upload-started="uploadStarted" 
             @upload-done="uploadDone"
             @clear-upload="clearUpload"
@@ -76,7 +76,7 @@
           @upload-multiple-started="uploadMultipleStarted"
        ></upload-multiple>
 
-       <v-container class="mt-2 mb-4 text-left" v-if="inputProduct.images.length">
+       <v-container class="mt-2 mb-4 text-left" v-if="showUploadMultiple">
         <div class="subheading mb-3" style="color: rgba(0, 0, 0, 0.6)">
               Images déjà uploadé
             </div>
@@ -156,7 +156,8 @@ export default {
         value => !value || value.size < 2000000 || 'Avatar size should be less than 2 MB!',
       ],
       isLoadingUploadImage: false,
-      isUpload: false
+      showUpload: false,
+      showUploadMultiple: true
   }),
   computed: {
       isEnableSubmit() {
@@ -200,10 +201,10 @@ export default {
         });
       },
       removeImage () {
+        this.deleteImageFromFirebase(this.inputProduct.avatarName)
         this.inputProduct.avatarUrl = ''
         this.inputProduct.avatarName = ''
-        this.isUpload = true
-        this.deleteImageFromFirebase(this.inputProduct.avatarName)
+        this.showUpload = true
       },
       removeImageGallerie(index, image) {
         this.inputProduct.images.splice(index, 1)
@@ -257,6 +258,14 @@ export default {
     }
   },
 
+  watch: {
+    'inputProduct.images'(val) {
+      if (!val.length) {
+        this.showUploadMultiple = false
+      }
+    },
+  },
+
   mounted () {
     this.isProductCreate = this.$route.name === 'productCreate';
     if (!this.isProductCreate && !this.product) {
@@ -267,10 +276,12 @@ export default {
         this.inputProduct.categoryId = productFind.categoryId;
         this.inputProduct.inStock = productFind.inStock;
         this.inputProduct.avatarUrl = productFind.avatarUrl;
+        this.inputProduct.avatarName = productFind.avatarName;
         if (productFind.images.length) {
           productFind.images.forEach(image => this.inputProduct.images.push(image))
         }
-        this.isUpload = this.inputProduct.avatarUrl ? false : true
+        this.showUpload = this.inputProduct.avatarUrl ? false : true
+        this.showUploadMultiple = productFind.images.length > 0
     }
     if (!this.isProductCreate && this.product) {
         this.inputProduct.name = this.product.name;
@@ -279,11 +290,13 @@ export default {
         this.inputProduct.categoryId = this.product.categoryId;
         this.inputProduct.inStock = this.product.inStock;
         this.inputProduct.avatarUrl = this.product.avatarUrl;
+        this.inputProduct.avatarName = this.product.avatarName;
         this.inputProduct.price = this.product.price;
         if (this.product.images.length) {
           this.product.images.forEach(image => this.inputProduct.images.push(image))
         }
-        this.isUpload = this.inputProduct.avatarUrl ? false : true
+        this.showUpload = this.inputProduct.avatarUrl ? false : true
+        this.showUploadMultiple = this.product.images.length > 0
       }
   },
 

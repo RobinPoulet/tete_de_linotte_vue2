@@ -44,6 +44,7 @@
 
 <script>
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+const moment = require("moment");
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -79,9 +80,10 @@ export default {
             const metadata = {
                 contentType: this.image.type
             };
-
+            const dateTime = moment().format('YYYYMMDDHHmmss');
+            const fileName = `${dateTime}_${this.image.name}`;
             // Upload file and metadata to the object 'images/mountains.jpg'
-            const storageRef = ref(storage, 'images/' + this.image.name);
+            const storageRef = ref(storage, `images/${fileName}`);
             const uploadTask = uploadBytesResumable(storageRef, this.image, metadata);
 
             // Listen for state changes, errors, and completion of the upload.
@@ -126,7 +128,7 @@ export default {
                 this.uploadValue = 100;
                 this.loading = false;
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    this.$emit('upload-done', downloadURL, this.image.name);
+                    this.$emit('upload-done', downloadURL, fileName);
                     console.log('File available at', downloadURL);
                     this.$toastr.s(`image a été upload avec succès`);
                 });
